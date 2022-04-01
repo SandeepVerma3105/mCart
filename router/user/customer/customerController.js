@@ -202,9 +202,57 @@ const getnerateOTP = async(req, res) => {
     }
 }
 
+const getProduct = async(req, res) => {
+    let field = [
+        { path: "categoryId", model: "category", select: ["name"] }
+    ]
+    data = req.body
+    if (!req.query) {
+        req.body = req.body
+    }
+
+    if (req.query.productId) {
+        req.body._id = req.query.productId
+        field = [
+            { path: "categoryId", model: "category", select: ["name"] }
+        ]
+    }
+    if (req.body.globalSearchString) {
+        req.body.$text = { $search: req.body.globalSearchString }
+    }
+    if (req.body.searchString) {
+        req.body.name = { $regex: '.*' + req.body.searchString + '.*' }
+
+    }
+    getdata = await helperService.populateQuery(ProductModel, req.body, field)
+    console.log(getdata)
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    } else {
+        result = await successResponse(
+            true, { data: getdata, count: getdata.count },
+            httpStatus.OK,
+            "",
+            constents.PRODUCT_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+}
+
+
 
 module.exports = {
     signUp,
     signIn,
-    getnerateOTP
+    getnerateOTP,
+    getProduct
 }

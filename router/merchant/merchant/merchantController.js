@@ -15,8 +15,10 @@ const { successResponse } = require("../../../response/success")
 
 const signUp = async(req, res, next) => {
     data = req.item
+
     addressId = await KEY.random_key()
     getdata = await helperService.findQuery(MerchantModel, { email: data.email })
+
     if (getdata.length > 0) {
         result = await successResponse(
             true,
@@ -28,6 +30,7 @@ const signUp = async(req, res, next) => {
             ""
         )
         res.status(httpStatus.CONFLICT).json(result)
+
     } else {
         let getdata = await helperService.insertQuery(MerchantModel, {
             firstName: data.firstName,
@@ -38,6 +41,7 @@ const signUp = async(req, res, next) => {
             address: [ObjectID(addressId)],
             password: data.password
         })
+        console.log(getdata)
         if (getdata.error) {
             result = await successResponse(
                 true,
@@ -160,7 +164,7 @@ const updateProfile = async(req, res, next) => {
     data = req.item
     id = req.query.id
 
-    getdata = await helperService.updateByIdQuery(MerchantModel, ObjectID(id), data)
+    getdata = await helperService.U(MerchantModel, ObjectID(id), data)
     if (getdata.error) {
         result = await successResponse(
             true,

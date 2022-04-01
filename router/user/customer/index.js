@@ -7,6 +7,7 @@ const verifyToken = require("../../../middleware/auth")
 
 route.post("/signUp", requestValidator(customerSchema.signUp), customerController.signUp)
 route.post("/generateOtp", requestValidator(customerSchema.phoneNumber), customerController.getnerateOTP)
-route.post("/signIn", requestValidator(customerSchema.signIn), customerController.signIn)
+route.post("/signIn", requestValidator(customerSchema.signIn), customerController.signIn),
+    route.get("/getProduct", customerController.getProduct)
 
 module.exports = route
