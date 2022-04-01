@@ -164,7 +164,7 @@ const updateProfile = async(req, res, next) => {
     data = req.item
     id = req.query.id
 
-    getdata = await helperService.U(MerchantModel, ObjectID(id), data)
+    getdata = await helperService.updateByIdQuery(MerchantModel, ObjectID(id), data)
     if (getdata.error) {
         result = await successResponse(
             true,
