@@ -4,6 +4,7 @@ const { head } = require("lodash")
 const errors = require("../error/error")
 const { successResponse } = require("../response/success")
 const constents = require("../constents/constent")
+
 const requestValidator = (schema, property = "body") => async(req, res, next) => {
     data = req[property]
     try {
@@ -23,7 +24,7 @@ const requestValidator = (schema, property = "body") => async(req, res, next) =>
             null,
             httpStatus.OK, {
                 errCode: errors.BAD_REQUEST.status,
-                errMsg: err.message
+                errMsg: constents.VALIDATION_ERROR
             },
             ""
         )

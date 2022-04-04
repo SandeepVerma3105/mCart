@@ -112,7 +112,7 @@ const Login = async(req, res) => {
             null,
             httpStatus.OK, {
                 errCode: errors.UNAUTHORIZED.status,
-                errMsg: constents.INVALID_CRADENTIAL
+                errMsg: constents.INVALID_CREDENTIAL
             },
             ""
         )
@@ -161,10 +161,56 @@ const profile = async(req, res, next) => {
 }
 
 const updateProfile = async(req, res, next) => {
-    data = req.item
+    data = req.body
     id = req.query.id
+    console.log(id, data)
+    getdata = await helperService.updateByIdQuery(MerchantModel, id, data)
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    }
+    if (getdata == 0) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.DATA_NOT_FOUND.status,
+                errMsg: constents.DATA_NOT_FOUND
+            },
+            ""
+        )
+        res.status(httpStatus.NOT_FOUND).json(result)
+    } else {
+        if (data.isDelete == true) {
+            msg = constents.DELETE_ACCOUNT
+        } else {
+            msg = constents.MERCHANT_UPDATE
+        }
+        result = await successResponse(
+            true, {
+                email: getdata.email
+            },
+            httpStatus.OK,
+            "",
+            msg
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+}
 
-    getdata = await helperService.updateByIdQuery(MerchantModel, ObjectID(id), data)
+const updateAddress = async(req, res) => {
+    data = req.item
+    id = req.query.addressId
+    merchantId = req.query.merchantId
+    getdata = await helperService.updateQuery(MerchantModel, { _id: id, merchantId: merchantId }, data)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -207,9 +253,11 @@ const updateProfile = async(req, res, next) => {
 }
 
 
+
 module.exports = {
     signUp,
     Login,
     profile,
     updateProfile,
+    updateAddress
 }

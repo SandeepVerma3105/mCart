@@ -4,7 +4,9 @@ const { Schema } = require("../config/connection")
 const otpSchema = mongoose.Schema({
         phoneNumber: {
             type: Number,
-            required: true
+        },
+        email: {
+            type: Number,
         },
         otp: {
             type: Number,

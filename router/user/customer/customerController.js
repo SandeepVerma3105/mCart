@@ -6,6 +6,7 @@ const { ProductModel } = require("../../../models/product")
 const { UserModel } = require("../../../models/user")
 const { UserAddressModel } = require("../../../models/userAddress")
 const { OtpModel } = require("../../../models/otp")
+const { CartModel } = require("../../../models/cart")
 
 const constents = require("../../../constents/constent")
 const errors = require("../../../error/error")
@@ -14,6 +15,7 @@ const KEY = require("../../../utils/randamKey")
 const helperService = require("../../../services/helper")
 const otp = require("../../../utils/otp")
 const { successResponse } = require("../../../response/success")
+const { OrderDetailModel } = require("../../../models/orderDetail")
 
 const signUp = async(req, res, next) => {
     data = req.item
@@ -118,7 +120,7 @@ const signIn = async(req, res) => {
             null,
             httpStatus.OK, {
                 errCode: errors.UNAUTHORIZED.status,
-                errMsg: constents.INVALID_CRADENTIAL
+                errMsg: constents.INVALID_CREDENTIAL
             },
             ""
         )
@@ -153,8 +155,7 @@ const signIn = async(req, res) => {
             result = await successResponse(
                 true, {
                     _id: getdata[0]._id,
-                    fullName: getdata[0].firstName + " " + getdata[0].lastName,
-                    email: getdata[0].email,
+                    phoneNumber: getdata[0].phoneNumber,
                     token: token
                 },
                 httpStatus.OK,
@@ -198,7 +199,7 @@ const getnerateOTP = async(req, res) => {
             "",
             constents.OTP_SENDED
         )
-        res.status(httpStatus.CONFLICT).json(result)
+        res.status(httpStatus.OK).json(result)
     }
 }
 
@@ -213,9 +214,6 @@ const getProduct = async(req, res) => {
 
     if (req.query.productId) {
         req.body._id = req.query.productId
-        field = [
-            { path: "categoryId", model: "category", select: ["name"] }
-        ]
     }
     if (req.body.globalSearchString) {
         req.body.$text = { $search: req.body.globalSearchString }
@@ -248,11 +246,186 @@ const getProduct = async(req, res) => {
     }
 }
 
+const addCart = async(req, res) => {
+    data = req.item
+    data.userId = req.query.userId
+    getData = await helperService.findQuery(ProductModel, { _id: data.productId })
+    if (getData[0].unit >= data.unit) {
+        getdata = await helperService.insertQuery({
+            userId: data.userId,
+            productId: data.productId,
+            unit: data.unit
+
+        })
+    }
+    if (getData[0].unit <= data.unit) {
+        result = await successResponse(
+            true, {
+                productQuantity: checkUnit[0].productId.unit,
+                orderQuantity: checkUnit[0].unit
+            },
+            httpStatus.OK, {
+                errCode: errors.BAD_REQUEST.status,
+                errMsg: constents.QUANTITY
+            },
+            ""
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+    if (getData.errors) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+
+    }
+
+}
+
+const placeOrder = async(req, res) => {
+    data = req.item
+    data.userId = req.query.userId
+    getData = await helperService.findQuery(ProductModel, { _id: data.productId })
+    if (getData[0].unit >= data.unit) {
+        getdata = await helperService.insertQuery({
+            userId: data.userId,
+            productId: data.productId,
+            unit: data.unit,
+            discount: getdata.discount,
+            baseCost: getData.baseCost,
+            addressId: data.addressId
+
+        })
+        if (getdata.errors) {
+            result = await successResponse(
+                true,
+                null,
+                httpStatus.OK, {
+                    errCode: errors.INTERNAL_SERVER_ERROR.status,
+                    errMsg: constents.INTERNAL_SERVER_ERROR
+                },
+                ""
+            )
+            res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+            return
+        }
+        if (addresses.length > 0)
+            getUserData[0].address = addresses
+        result = await successResponse(
+            true, {
+                getUserData,
+
+            },
+            httpStatus.OK,
+            "",
+            constents.ORDER_PLACED)
+        res.status(httpStatus.OK).json(result)
+
+    }
+
+    if (getData[0].unit <= data.unit) {
+        result = await successResponse(
+            true, {
+                productQuantity: checkUnit[0].productId.unit,
+                orderQuantity: checkUnit[0].unit
+            },
+            httpStatus.OK, {
+                errCode: errors.BAD_REQUEST.status,
+                errMsg: constents.QUANTITY
+            },
+            ""
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+    if (getData.errors) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+
+    }
+}
+
+const trackOrder = async(req, res) => {
+    data = req.item
+    data.orderStatus != 5
+    field = [
+        { path: "produtId", model: "product", select: ["_id", "name", "description", "longDescription"] },
+    ]
+    getdata = await helperService.populateQuery(OrderDetailModel, { userId: ObjectID(data.id) })
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    } else {
+        result = await successResponse(
+            true, { data: getdata, count: getdata.count },
+            httpStatus.OK,
+            "",
+            constents.PRODUCT_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+}
+
+
+const orderHistory = async(req, res) => {
+    data = req.item
+    field = [
+        { path: "produtId", model: "product", select: ["_id", "name", "description", "longDescription"] },
+    ]
+    getdata = await helperService.populateQuery(OrderDetailModel, { userId: ObjectID(data.id) })
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    } else {
+        result = await successResponse(
+            true, { data: getdata, count: getdata.count },
+            httpStatus.OK,
+            "",
+            constents.PRODUCT_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+}
+
+
 
 
 module.exports = {
     signUp,
     signIn,
     getnerateOTP,
-    getProduct
+    getProduct,
+    addCart,
+    placeOrder,
+    trackOrder,
+    orderHistory,
 }

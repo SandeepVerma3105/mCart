@@ -34,6 +34,10 @@ const logIn = joi.object().keys({
     email: joi.string().email().required(),
     password: joi.string().required()
 })
+const updateIds = joi.object().keys({
+    addressId: joi.string().email().required().min(24).max(24),
+    merchantId: joi.string().required().min(24).max(24)
+})
 
 const del = joi.object().keys({
     isDelete: joi.boolean().required()
@@ -44,5 +48,6 @@ module.exports = {
     update,
     id,
     logIn,
-    del
+    del,
+    updateIds
 }

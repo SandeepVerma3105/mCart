@@ -9,5 +9,9 @@ route.post("/signUp", requestValidator(customerSchema.signUp), customerControlle
 route.post("/generateOtp", requestValidator(customerSchema.phoneNumber), customerController.getnerateOTP)
 route.post("/signIn", requestValidator(customerSchema.signIn), customerController.signIn),
     route.get("/getProduct", customerController.getProduct)
+route.post("/addCart", customerController.addCart),
+    route.post("/placeOrder", customerController.placeOrder),
+    route.get("/trackOrder", customerController.trackOrder),
+    route.get("/orderHistory", customerController.orderHistory),
 
-module.exports = route
+    module.exports = route

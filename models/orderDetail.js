@@ -5,15 +5,18 @@ const { Schema } = require("../config/connection")
 const orderSchema = mongoose.Schema({
     userId: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        ref: "user"
     },
     userAddressId: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        ref: "userAddress"
     },
     productId: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        ref: "product",
     },
     baseCost: {
         type: Number,

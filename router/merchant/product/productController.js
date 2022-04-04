@@ -64,11 +64,10 @@ const brands = async(req, res) => {
 
 const addProduct = async(req, res, next) => {
     data = req.item
-
     let getmerchant = await helperService.findQuery(MerchantModel, { _id: data.merchantId })
     if (getmerchant.length > 0) {
         if (data.discount) {
-            disCost = data.baseCost * (data.discount / 100)
+            disCost = data.baseCost - (data.baseCost * (data.discount / 100))
         } else {
             disCost = 0
         }

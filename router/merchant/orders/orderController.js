@@ -60,7 +60,7 @@ const changeOrederStatus = async(req, res) => {
             },
             ""
         )
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+        res.status(httpStatus.BAD_REQUEST).json(result)
         return
     }
     getdata = await helperService.updateByIdQuery(OrderDetailModel, data.orderId, { orderStatus: data.status })
@@ -208,5 +208,6 @@ const ordersDetail = async(req, res) => {
 module.exports = {
     orders,
     changeOrederStatus,
-    acceptOrder
+    acceptOrder,
+    ordersDetail
 }

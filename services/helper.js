@@ -13,6 +13,7 @@ limit the data
 total count of data
 */
 const findQuery = async(model, data = {}, res) => {
+
     data.isDelete = false
     if (!data.sortKey && !data.order) {
         sort = {}
@@ -60,7 +61,6 @@ const insertQuery = async(model, data, res) => {
 const updateByIdQuery = async(model, qury, data, res) => {
     try {
         res = await model.findByIdAndUpdate(qury, data)
-
         if (res == null) {
             return 0
         } else {

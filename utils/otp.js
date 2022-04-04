@@ -7,10 +7,12 @@ const getOtp = async(key) => {
 }
 const getnerateOTP = async(data) => {
     let otp = await getOtp()
-    getdata = await helperService.findQuery(OtpModel, { phoneNumber: data.phoneNumber })
+    getdata = await helperService.findQuery(OtpModel, data)
+    console.log("hjhdj", getdata)
     if (getdata == 0) {
         insertOtp = await helperService.insertQuery(OtpModel, {
             phoneNumber: data.phoneNumber,
+            email: data.email,
             otp: otp
         })
         if (insertOtp.errors) {
