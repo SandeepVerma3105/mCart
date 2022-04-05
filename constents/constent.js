@@ -62,5 +62,6 @@ module.exports = message = {
     ORDER_DELEVERED: "order has delivered now",
     INVALID_ORDER_STATUS: "please enter a valid status, 1 for PENDING, 3 for CANCEL, 4 for IN TRANSIT, 5 for DELIVERED ",
 
+    CUSTOMER_VALIDATION: "you are not a valid customer"
 
 }

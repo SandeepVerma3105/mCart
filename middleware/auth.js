@@ -6,7 +6,8 @@ const secretKey = process.env.SECRET_KEY
 const errors = require('../error/error')
 const jwtDecode = require("jwt-decode")
 const { successResponse } = require("../response/success")
-    //verify token 
+
+//verify token 
 function verifyToken(req, res, next) {
     let token = req.headers['accesstoken'];
     console.log("TCL: verifyToken -> token", token)
@@ -41,11 +42,11 @@ function verifyToken(req, res, next) {
 }
 
 //valiation for merchant to access apis
-function parseJwtMerchent(req, res, next) {
+async function parseJwtMerchent(req, res, next) {
     let token = req.headers['accesstoken']
     const data = jwtDecode(token)
     if (data.role != "merchant" && data.role != "admin") {
-        result = successResponse(
+        result = await successResponse(
             true,
             null,
             httpStatus.OK, {
@@ -61,15 +62,39 @@ function parseJwtMerchent(req, res, next) {
 }
 
 //valiation for admin to access apis
-function parseJwtAdmin(req, res, next) {
+async function parseJwtAdmin(req, res, next) {
     let token = req.headers['accesstoken']
     const data = jwtDecode(token)
     if (data.role != "admin") {
-        res.status(httpStatus.UNAUTHORIZED).send({
-            success: false,
-            error: httpStatus.UNAUTHORIZED + " UNAUTHORIZED",
-            message: constent.ADMIN_VALIDATION
-        })
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.UNAUTHORIZED.status,
+                errMsg: constent.ADMIN_VALIDATION
+            },
+            ""
+        )
+        res.status(httpStatus.UNAUTHORIZED).json(result)
+    } else {
+        next()
+    }
+}
+
+async function parseJwtCustomer(req, res, next) {
+    let token = req.headers['accesstoken']
+    const data = jwtDecode(token)
+    if (data.role != "customer" && data.role != "admin") {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.UNAUTHORIZED.status,
+                errMsg: constent.CUSTOMER_VALIDATION
+            },
+            ""
+        )
+        res.status(httpStatus.UNAUTHORIZED).json(result)
     } else {
         next()
     }
@@ -78,5 +103,6 @@ function parseJwtAdmin(req, res, next) {
 module.exports = {
     verifyToken,
     parseJwtMerchent,
-    parseJwtAdmin
+    parseJwtAdmin,
+    parseJwtCustomer
 }

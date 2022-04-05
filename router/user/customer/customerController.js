@@ -308,7 +308,7 @@ const placeOrder = async(req, res) => {
     console.log(data, getData)
     if (getData.length > 0 && getData[0].unit >= data.unit) {
         getdata = await helperService.insertQuery(OrderDetailModel, {
-            userId: data.userId,
+            userId: req.query.userId,
             productId: data.productId,
             unit: data.unit,
             discount: getData[0].discount,

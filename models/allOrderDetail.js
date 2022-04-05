@@ -59,6 +59,9 @@ const orderSchema = mongoose.Schema({
     transectionId: {
         type: String
     },
+    totalAmount: {
+        type: Number
+    }
 }, { timestamps: true })
 
 const AllOrderDetailModel = mongoose.model('allOrderDetail', orderSchema)

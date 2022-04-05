@@ -86,7 +86,7 @@ const paymentDetail = async(req, res, next) => {
 }
 
 const paymentList = async(req, res, next) => {
-    data = req.body
+    data = req.query
     getdata = await helperService.findQuery(PaymentModel, { userId: data.userId })
     if (getdata.error) {
         result = await successResponse(
@@ -193,10 +193,11 @@ const makePayment = async(req, res) => {
         { path: "userId", model: "user", select: ["_id", "firstName", "lastName"] },
         { path: "userAddressId", model: "userAddress", select: ["_id", "houseNo", "state", "pinCode"] },
     ]
-    transectionId = KEY.random_key()
+    transectionId = await KEY.random_key()
     await helperService.populateQuery(OrderDetailModel, { userId: userId, _id: data.orderId }, field)
 
     .then(async(result) => {
+        totalAmount = (result[0].baseCost * result[0].unit) + ((result[0].baseCost * result[0].unit) * result[0].discount) / 100
         console.log(result)
         if (result != 0) {
             data = {
@@ -209,18 +210,17 @@ const makePayment = async(req, res) => {
                 discount: result[0].discount,
                 unit: result[0].unit,
                 address: {
-                    houseNo: result[0].addressId.houseNo,
-                    state: result[0].addressId.state,
-                    pincode: result[0].addressId.pincode,
-                    city: result[0].addressId.pincode,
+                    houseNo: result[0].userAddressId.houseNo,
+                    state: result[0].userAddressId.state,
+                    pincode: result[0].userAddressId.pincode,
+                    city: result[0].userAddressId.pincode,
                 },
                 transectionStatus: true,
                 transectionId: transectionId,
                 totalAmount: totalAmount
             }
-            await helperService.insertQuery(AllOrderDetailModel, data).then(async(result) => {
-                if (getdata.error) {
-                    console.log(result)
+            await helperService.insertQuery(AllOrderDetailModel, data).then(async(resultdata) => {
+                if (result.error) {
                     result = await successResponse(
                         true,
                         null,
@@ -234,7 +234,7 @@ const makePayment = async(req, res) => {
                 } else {
                     result = await successResponse(
                         true, {
-                            result,
+                            resultdata,
                         },
                         httpStatus.OK,
                         "",
