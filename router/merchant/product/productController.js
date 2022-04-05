@@ -131,6 +131,7 @@ const getProduct = async(req, res) => {
         req.query._id = req.query.productId
         field = [
             { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "email"] },
+            { path: "categoryId", model: "category", select: ["_id", "name", "lastName"] },
             { path: "categoryId", model: "category", select: ["_id", "name", "lastName"] }
         ]
     }
@@ -141,9 +142,10 @@ const getProduct = async(req, res) => {
         req.query.$text = { $search: req.query.globalSearchString }
     }
     if (req.query.searchString) {
-        req.query.name = { $regex: '.*' + req.query.searchString + '.*' }
+        req.query.name = { $regex: '.*' + req.query.searchString + '.*', "$options": 'i' }
 
     }
+    // $search: req.query.globalSearchString, "$option": 'i'
     getdata = await helperService.populateQuery(ProductModel, req.query, field)
     console.log(getdata)
     if (getdata.error) {
