@@ -13,8 +13,12 @@ const status = joi.object().keys({
 const orderId = joi.object().keys({
     orderId: joi.string().required().min(24).max(24)
 })
+const merchantId = joi.object().keys({
+    _id: joi.string().required().min(24).max(24)
+})
 module.exports = {
     id,
     status,
-    orderId
+    orderId,
+    merchantId
 }

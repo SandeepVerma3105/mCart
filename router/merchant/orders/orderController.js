@@ -12,7 +12,7 @@ const helperService = require("../../../services/helper")
 const { successResponse } = require("../../../response/success")
 
 const orders = async(req, res) => {
-    getdata = await helperService.findQuery(OrderDetailModel, req.body)
+    getdata = await helperService.findQuery(OrderDetailModel, req.query)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -181,7 +181,7 @@ const acceptOrder = async(req, res) => {
 }
 
 const ordersDetail = async(req, res) => {
-    getdata = await helperService.populateQuery(OrderDetailModel, req.body, [])
+    getdata = await helperService.populateQuery(OrderDetailModel, req.query, [])
     if (getdata.error) {
         result = await successResponse(
             true,

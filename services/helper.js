@@ -4,16 +4,17 @@ const { MerchantAddressModel } = require("../models/merchantAddress")
 const { path } = require("express/lib/application")
 const { UserModel } = require("../models/user")
 const { OtpModel } = require("../models/otp")
-
-/*
-query to find data based on value, 
-you can sort data based on any field ascending or in decending order
-skip the data as you want or find n'th data
-limit the data 
-total count of data
-*/
+const { CartModel } = require("../models/cart")
+const { BrandModel } = require("../models/brand")
+    /*
+    query to find data based on value, 
+    you can sort data based on any field ascending or in decending order
+    skip the data as you want or find n'th data
+    limit the data 
+    total count of data
+    */
 const findQuery = async(model, data = {}, res) => {
-
+    console.log(data)
     data.isDelete = false
     if (!data.sortKey && !data.order) {
         sort = {}
@@ -31,7 +32,6 @@ const findQuery = async(model, data = {}, res) => {
             [sortKey]: order
         }
     }
-
     try {
         res = await model.find(data).skip(data.skip).limit(data.limit).sort(sort).select(["-__v"])
         if (res.length > 0) {
@@ -54,6 +54,7 @@ const insertQuery = async(model, data, res) => {
             return res
         }
     } catch (error) {
+        console.log(error)
         return error
     }
 }

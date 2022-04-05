@@ -31,16 +31,9 @@ const orderSchema = mongoose.Schema({
     },
     orderStatus: {
         type: Number,
-        enum: [{ 1: "pending", 2: "approved", 3: "canceled", 4: "in-transit", 5: "delevered" }],
+        enum: [1, 2, 3, 4, 5],
         default: 1
-    },
-    transectionStatus: {
-        type: Boolean,
-        default: false
-    },
-    transectionId: {
-        type: String
-    },
+    }
 }, { timestamps: true })
 
 const OrderDetailModel = mongoose.model('orderDetail', orderSchema)

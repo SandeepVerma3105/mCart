@@ -6,7 +6,7 @@ const cartSchema = mongoose.Schema({
             type: Number,
             required: true
         },
-        price: {
+        baseCost: {
             type: Number,
             required: true
         },

@@ -123,28 +123,28 @@ const addProduct = async(req, res, next) => {
 
 const getProduct = async(req, res) => {
     let field = ''
-    data = req.body
+    data = req.query
     if (!req.query) {
-        req.body = req.body
+        req.query = req.query
     }
     if (req.query.productId) {
-        req.body._id = req.query.productId
+        req.query._id = req.query.productId
         field = [
             { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "email"] },
             { path: "categoryId", model: "category", select: ["_id", "name", "lastName"] }
         ]
     }
     if (req.query.merchantId) {
-        req.body.merchantId = req.query.merchantId
+        req.query.merchantId = req.query.merchantId
     }
     if (req.body.globalSearchString) {
-        req.body.$text = { $search: req.body.globalSearchString }
+        req.query.$text = { $search: req.query.globalSearchString }
     }
     if (req.body.searchString) {
-        req.body.name = { $regex: '.*' + req.body.searchString + '.*' }
+        req.query.name = { $regex: '.*' + req.query.searchString + '.*' }
 
     }
-    getdata = await helperService.populateQuery(ProductModel, req.body, field)
+    getdata = await helperService.populateQuery(ProductModel, req.query, field)
     console.log(getdata)
     if (getdata.error) {
         result = await successResponse(

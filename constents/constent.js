@@ -2,6 +2,9 @@ module.exports = message = {
     VALIDATION_ERROR: "validation error",
     EMAIL_NOT_EXIST: "email not exist",
     DATA_NOT_FOUND: "no data found",
+
+    UPDATE_QUANTITY: "quantity has beeen updated",
+    ADD_CART: "product added into cart",
     ADD_PEODUCT: "product has been added successfully",
     PRODUCT_LIST: " find product list here",
     UPDATE_PRODUCT: "product detail updated successfully",
@@ -24,6 +27,13 @@ module.exports = message = {
     ADMIN_VALIDATION: " you are not a valid admin",
     DELETE_ACCOUNT: "Account has been deleted successfully",
     EMPTY_FIELDS: "no data found in request body",
+
+    USER_NOT_EXIST: "invalid user Id",
+    CARD_ADDED: "card has been added succesfully",
+    CARD_EXIST: "card allready exist please use diffrent",
+    CARD_DETAIL_UPDATED: "your card detail has been updated successfully",
+    CARD_DELETED: "your card has been deleted",
+    PAYMENT_SUCCESSFULL: "payment has been successfull",
 
     ORDER_LIST: "find order list here",
     CHANGE_ORDER_STATUS: "order status has been changed",
@@ -50,5 +60,7 @@ module.exports = message = {
     ORDER_CANCEL: "order state has been CANCELLED",
     ORDER_IN_TRANSIT: "order state is in transit now",
     ORDER_DELEVERED: "order has delivered now",
-    INVALID_ORDER_STATUS: "please enter a valid status, 1 for PENDING, 3 for CANCEL, 4 for IN TRANSIT, 5 for DELIVERED "
+    INVALID_ORDER_STATUS: "please enter a valid status, 1 for PENDING, 3 for CANCEL, 4 for IN TRANSIT, 5 for DELIVERED ",
+
+
 }

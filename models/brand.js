@@ -12,15 +12,12 @@ const brandSchema = mongoose.Schema({
     },
     isDelete: {
         type: Boolean,
-        dafault: false
+        default: false
     },
     status: {
         type: Boolean,
         default: false
     },
-    createdAt: {
-        type: Date,
-    }
 }, { timestamps: true })
 
 

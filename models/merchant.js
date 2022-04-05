@@ -26,8 +26,9 @@ const merchantSchema = mongoose.Schema({
         required: true
     },
     countryCode: {
-        type: Number,
-        required: true
+        type: String,
+        required: true,
+        default: "+91"
     },
     address: [{ type: Schema.Types.ObjectId, ref: "merchantAddress" }],
     status: {
