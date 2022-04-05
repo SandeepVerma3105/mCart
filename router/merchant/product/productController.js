@@ -12,7 +12,7 @@ const helperService = require("../../../services/helper")
 const { successResponse } = require("../../../response/success")
 
 const category = async(req, res) => {
-    getdata = await helperService.findQuery(CategoryModel, req.body)
+    getdata = await helperService.findQuery(CategoryModel, req.query)
     console.log(getdata)
     if (getdata.error) {
         result = await successResponse(
@@ -38,7 +38,7 @@ const category = async(req, res) => {
 
 
 const brands = async(req, res) => {
-    getdata = await helperService.findQuery(BrandModel, req.body)
+    getdata = await helperService.findQuery(BrandModel, req.query)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -137,10 +137,10 @@ const getProduct = async(req, res) => {
     if (req.query.merchantId) {
         req.query.merchantId = req.query.merchantId
     }
-    if (req.body.globalSearchString) {
+    if (req.query.globalSearchString) {
         req.query.$text = { $search: req.query.globalSearchString }
     }
-    if (req.body.searchString) {
+    if (req.query.searchString) {
         req.query.name = { $regex: '.*' + req.query.searchString + '.*' }
 
     }
