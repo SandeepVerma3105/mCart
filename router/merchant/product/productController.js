@@ -126,22 +126,17 @@ const addProduct = async(req, res, next) => {
 
 const getProduct = async(req, res) => {
     let field = [
-        { path: "merchantId", model: "merchant", select: ["_id", "firstName"] },
-        { path: "categoryId", model: "category", select: ["_id", "name"] },
-        { path: "brandId", model: "brand", select: ["_id", "name"] }
+        { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "email"] },
+        { path: "categoryId", model: "category", select: ["_id", "name", "lastName"] },
+        { path: "brandId", model: "brand", select: ["_id", "name", "lastName"] }
     ]
     data = req.query
     if (!req.query) {
         req.query = req.query
     }
-    if (req.query.productId) {
-        req.query._id = req.query.productId
-        field = [
-            { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "email"] },
-            { path: "categoryId", model: "category", select: ["_id", "name", "lastName"] },
-            { path: "brandId", model: "brand", select: ["_id", "name", "lastName"] }
-        ]
-    }
+    // if (req.query.productId) {
+    //     req.query._id = req.query.productId
+    // }
     if (req.query.merchantId) {
         req.query.merchantId = req.query.merchantId
     }
@@ -149,7 +144,7 @@ const getProduct = async(req, res) => {
         req.query.$text = { $search: req.query.globalSearchString }
     }
     if (req.query.searchString) {
-        req.query.name = { $regex: '.*' + req.query.searchString + '.*', "$options": 'i' }
+        req.query.categoryId = { $regex: '.*' + req.query.searchString + '.*', "$options": 'i' }
 
     }
     // $search: req.query.globalSearchString, "$option": 'i'
