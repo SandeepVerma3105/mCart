@@ -18,14 +18,19 @@ const updatePayment = joi.object().keys({
     expDate: Joid.date().format("MM/YY").greater('now'),
 })
 
-const userId = joi.object().keys({
+const id = joi.object().keys({
     id: joi.string().min(24).max(24)
 })
 
+const payment = joi.object().keys({
+    userId: joi.string().min(24).max(24),
+    orderId: joi.string().min(24).max(24)
+})
 
 
 module.exports = {
     paymentDetail,
     updatePayment,
-    userId
+    id,
+    payment
 }

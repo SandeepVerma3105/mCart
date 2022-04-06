@@ -12,7 +12,7 @@ const signUp = joi.object().keys({
         landMark: joi.string().regex(pattern.strPattern),
         pinCode: joi.number().required(),
         city: joi.string().required().regex(pattern.strPattern),
-        state: joi.string().required().regex(pattern.strPattern),
+        state: joi.string().required().regex(pattern.state),
         country: joi.string().regex(pattern.strPattern),
     }),
 })

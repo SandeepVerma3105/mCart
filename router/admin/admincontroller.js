@@ -50,7 +50,8 @@ const Login = async(req, res) => {
         )
         res.status(httpStatus.UNAUTHORIZED).json(result)
     } else {
-        let token = jwtToken(getdata.email, getdata.role)
+        console.log(getdata)
+        let token = jwtToken(getdata[0].email, getdata[0].role)
         result = await successResponse(
             true, {
                 _id: getdata[0]._id,
@@ -157,6 +158,60 @@ const addMerchant = async(req, res, next) => {
     }
 }
 
+const blockMerchant = async(req, res) => {
+    data = req.item
+    console.log(data)
+    getdata = await helperService.updateByIdQuery(MerchantModel, { _id: data.id }, { status: data.status })
+    if (getdata.reason) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    }
+    if (getdata == 0) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.DATA_NOT_FOUND.status,
+                errMsg: constents.DATA_NOT_FOUND
+            },
+            ""
+        )
+        res.status(httpStatus.NOT_FOUND).json(result)
+    } else {
+        await helperService.updateQuery(ProductModel, { merchantId: data.id }, { status: data.status }).then(async(result) => {
+            result = await successResponse(
+                true, {
+                    customer: getdata,
+                },
+                httpStatus.OK,
+                "",
+                constents.CHANGE_customer_STATUS
+            )
+            res.status(httpStatus.OK).json(result)
+        }).catch(async(err) => {
+            result = await successResponse(
+                true,
+                null,
+                httpStatus.OK, {
+                    errCode: errors.INTERNAL_SERVER_ERROR.status,
+                    errMsg: constents.INTERNAL_SERVER_ERROR
+                },
+                ""
+            )
+            res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+        })
+
+    }
+}
+
 
 const addCategory = async(req, res, next) => {
     data = req.item
@@ -194,7 +249,7 @@ const addCategory = async(req, res, next) => {
         if (getCatData.length > 0)
             result = await successResponse(
                 true, {
-                    getCataData,
+                    getCatData,
 
                 },
                 httpStatus.OK,
@@ -206,48 +261,64 @@ const addCategory = async(req, res, next) => {
 
 const addBrand = async(req, res, next) => {
     data = req.item
-    getdata = await helperService.findQuery(BrandModel, { name: data.name })
-    console.log(data.name)
-    console.log("ndkdd", getdata)
-    if (getdata.length > 0) {
+    console.log(data)
+    await helperService.findQuery(CategoryModel, { _id: req.item.categoryId }).then(async(result) => {
+        if (result.length > 0) {
+            getdata = await helperService.findQuery(BrandModel, { name: data.name })
+            if (getdata.length > 0) {
+                result = await successResponse(
+                    true,
+                    null,
+                    httpStatus.OK, {
+                        errCode: errors.CONFLICT.status,
+                        errMsg: constents.BRAND_EXIST
+                    },
+                    ""
+                )
+                res.status(httpStatus.CONFLICT).json(result)
+            }
+            if (getdata == 0) {
+                let getBrndData = await helperService.insertQuery(BrandModel, {
+                    categoryId: data.categoryId,
+                    name: data.name,
+                    description: data.description
+                })
+                if (getBrndData.errors) {
+                    result = await successResponse(
+                        true,
+                        null,
+                        httpStatus.OK, {
+                            errCode: errors.INTERNAL_SERVER_ERROR.status,
+                            errMsg: constents.INTERNAL_SERVER_ERROR
+                        },
+                        ""
+                    )
+                    res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+                }
+                if (getBrndData.length > 0)
+                    result = await successResponse(
+                        true,
+                        getBrndData[0],
+
+                        httpStatus.OK,
+                        "",
+                        constents.BRAND_ADDED)
+                res.status(httpStatus.OK).json(result)
+            }
+        }
+    }).catch(async(err) => {
+        console.log(err)
         result = await successResponse(
             true,
             null,
             httpStatus.OK, {
-                errCode: errors.CONFLICT.status,
-                errMsg: constents.BRAND_EXIST
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
             },
             ""
         )
-        res.status(httpStatus.CONFLICT).json(result)
-    }
-    if (getdata == 0) {
-        let getBrndData = await helperService.insertQuery(BrandModel, {
-            name: data.name,
-            description: data.description
-        })
-        if (getBrndData.errors) {
-            result = await successResponse(
-                true,
-                null,
-                httpStatus.OK, {
-                    errCode: errors.INTERNAL_SERVER_ERROR.status,
-                    errMsg: constents.INTERNAL_SERVER_ERROR
-                },
-                ""
-            )
-            res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-        }
-        if (getBrndData.length > 0)
-            result = await successResponse(
-                true,
-                getBrndData[0],
-
-                httpStatus.OK,
-                "",
-                constents.BRAND_ADDED)
-        res.status(httpStatus.OK).json(result)
-    }
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    })
 }
 
 
@@ -257,5 +328,6 @@ module.exports = {
     Login,
     addMerchant,
     addCategory,
-    addBrand
+    addBrand,
+    blockMerchant
 }

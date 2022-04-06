@@ -15,8 +15,9 @@ const productSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    brandName: {
-        type: String,
+    brandId: {
+        type: Schema.Types.ObjectId,
+        ref: "brand"
 
     },
     sortDescription: {

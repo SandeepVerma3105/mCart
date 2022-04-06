@@ -65,6 +65,7 @@ async function parseJwtMerchent(req, res, next) {
 async function parseJwtAdmin(req, res, next) {
     let token = req.headers['accesstoken']
     const data = jwtDecode(token)
+    console.log(data)
     if (data.role != "admin") {
         result = await successResponse(
             true,

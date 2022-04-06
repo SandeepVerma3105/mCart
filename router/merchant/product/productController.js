@@ -38,7 +38,10 @@ const category = async(req, res) => {
 
 
 const brands = async(req, res) => {
-    getdata = await helperService.findQuery(BrandModel, req.query)
+    field = [
+        { path: "categoryId", model: "category", select: ["_id", "name"] },
+    ]
+    getdata = await helperService.populateQuery(BrandModel, req.query, field)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -74,7 +77,7 @@ const addProduct = async(req, res, next) => {
         let getdata = await helperService.insertQuery(ProductModel, {
             merchantId: data.merchantId,
             categoryId: data.categoryId,
-            brandName: data.brandName,
+            brandId: data.brandId,
             name: data.name,
             sortDescription: data.sortDescription,
             longDescription: data.longDescription,
@@ -122,7 +125,11 @@ const addProduct = async(req, res, next) => {
 }
 
 const getProduct = async(req, res) => {
-    let field = ''
+    let field = [
+        { path: "merchantId", model: "merchant", select: ["_id", "firstName"] },
+        { path: "categoryId", model: "category", select: ["_id", "name"] },
+        { path: "brandId", model: "brand", select: ["_id", "name"] }
+    ]
     data = req.query
     if (!req.query) {
         req.query = req.query
@@ -132,7 +139,7 @@ const getProduct = async(req, res) => {
         field = [
             { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "email"] },
             { path: "categoryId", model: "category", select: ["_id", "name", "lastName"] },
-            { path: "categoryId", model: "category", select: ["_id", "name", "lastName"] }
+            { path: "brandId", model: "brand", select: ["_id", "name", "lastName"] }
         ]
     }
     if (req.query.merchantId) {

@@ -6,9 +6,10 @@ const { requestValidator } = require("../../middleware/request_validator")
 const verifyToken = require("../../middleware/auth")
 
 route.post("/forgetPassword", requestValidator(adminSchema.email), adminController.forgetPaassword)
-route.post("/logIn", requestValidator(adminSchema.credeintial), adminController.Login),
-    route.post("/addMerchant", requestValidator(adminSchema.addMerchant), adminController.addMerchant),
-    route.post("/category", requestValidator(adminSchema.categoryBrand), adminController.addCategory)
-route.post("/brand", requestValidator(adminSchema.categoryBrand), adminController.addBrand)
+route.post("/logIn", requestValidator(adminSchema.credeintial), adminController.Login)
+route.post("/addMerchant", verifyToken.verifyToken, verifyToken.parseJwtAdmin, requestValidator(adminSchema.addMerchant), adminController.addMerchant)
+route.post("/category", verifyToken.verifyToken, verifyToken.parseJwtAdmin, requestValidator(adminSchema.category), adminController.addCategory)
+route.post("/brand", verifyToken.verifyToken, verifyToken.parseJwtAdmin, requestValidator(adminSchema.brand), adminController.addBrand)
+route.put("/blockMerchant", verifyToken.verifyToken, verifyToken.parseJwtAdmin, requestValidator(adminSchema.block, "query"), adminController.blockMerchant)
 
 module.exports = route

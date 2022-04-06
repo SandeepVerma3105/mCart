@@ -6,7 +6,12 @@ const credeintial = joi.object().keys({
     password: joi.string().required()
 })
 
-const categoryBrand = joi.object().keys({
+const category = joi.object().keys({
+    name: joi.string().required().regex(pattern.strPattern),
+    description: joi.string().required().regex(pattern.strPattern)
+})
+const brand = joi.object().keys({
+    categoryId: joi.string().min(24).max(24),
     name: joi.string().required().regex(pattern.strPattern),
     description: joi.string().required().regex(pattern.strPattern)
 })
@@ -21,9 +26,16 @@ const addMerchant = joi.object().keys({
     lastName: joi.string().required().max(30).regex(pattern.strPattern),
 })
 
+const block = joi.object().keys({
+    id: joi.string().required().min(24).max(24),
+    status: joi.boolean().required(),
+})
+
 module.exports = {
-    categoryBrand,
+    category,
+    brand,
     credeintial,
     email,
-    addMerchant
+    addMerchant,
+    block
 }

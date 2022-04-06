@@ -33,7 +33,17 @@ const orderSchema = mongoose.Schema({
         type: Number,
         enum: [1, 2, 3, 4, 5],
         default: 1
-    }
+    },
+    transectionStatus: {
+        type: Boolean,
+        default: false
+    },
+    paymentKey: {
+        type: String
+    },
+    transectionId: {
+        type: String
+    },
 }, { timestamps: true })
 
 const OrderDetailModel = mongoose.model('orderDetail', orderSchema)

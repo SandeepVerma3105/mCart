@@ -3,7 +3,7 @@ const pattern = require("../../../utils/regex")
 const addProduct = joi.object().keys({
     merchantId: joi.string().required().min(24).max(24),
     categoryId: joi.string().required().min(24).max(24),
-    brandName: joi.string().required().regex(pattern.productPattern),
+    brandId: joi.string().required().min(24).max(24),
     name: joi.string().min(2).required().regex(pattern.strPattern),
     sortDescription: joi.string().required().min(5).max(100).regex(pattern.productPattern),
     logDescription: joi.string().min(50).regex(pattern.productPattern),

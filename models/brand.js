@@ -2,6 +2,10 @@ const mongoose = require("mongoose")
 const { Schema } = require("../config/connection")
 
 const brandSchema = mongoose.Schema({
+    categoryId: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
     name: {
         type: String,
         required: true

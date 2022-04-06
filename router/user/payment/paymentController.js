@@ -8,6 +8,8 @@ const { UserAddressModel } = require("../../../models/userAddress")
 const { OtpModel } = require("../../../models/otp")
 const { CartModel } = require("../../../models/cart")
 const { PaymentModel } = require("../../../models/payment")
+const { OrderDetailModel } = require("../../../models/orderDetail")
+const { AllOrderDetailModel } = require("../../../models/allOrderDetail")
 
 const constents = require("../../../constents/constent")
 const errors = require("../../../error/error")
@@ -16,9 +18,9 @@ const KEY = require("../../../utils/randamKey")
 const helperService = require("../../../services/helper")
 const otp = require("../../../utils/otp")
 const { successResponse } = require("../../../response/success")
-const { OrderDetailModel } = require("../../../models/orderDetail")
+
 const req = require("express/lib/request")
-const { AllOrderDetailModel } = require("../../../models/allOrderDetail")
+
 
 
 
@@ -186,40 +188,28 @@ const deletepayment = async(req, res, next) => {
 }
 
 const makePayment = async(req, res) => {
-    data = req.body
-    userId = req.query.userId
+    data = req.item
+    console.log(data)
     field = [
         { path: "productId", model: "product" },
         { path: "userId", model: "user", select: ["_id", "firstName", "lastName"] },
         { path: "userAddressId", model: "userAddress", select: ["_id", "houseNo", "state", "pinCode"] },
     ]
     transectionId = await KEY.random_key()
-    await helperService.populateQuery(OrderDetailModel, { userId: userId, _id: data.orderId }, field)
+    await helperService.populateQuery(OrderDetailModel, { userId: data.userId, _id: data.orderId }, field)
 
     .then(async(result) => {
         totalAmount = (result[0].baseCost * result[0].unit) + ((result[0].baseCost * result[0].unit) * result[0].discount) / 100
         console.log(result)
         if (result != 0) {
-            data = {
-                orderId: data.orderId,
-                userId: userId,
-
-                productId: result[0].productId._id,
-                productName: result[0].productId.name,
-                baseCost: result[0].baseCost,
-                discount: result[0].discount,
-                unit: result[0].unit,
-                address: {
-                    houseNo: result[0].userAddressId.houseNo,
-                    state: result[0].userAddressId.state,
-                    pincode: result[0].userAddressId.pincode,
-                    city: result[0].userAddressId.pincode,
-                },
+            paymentData = {
+                paymentKey: data.paymentKey,
                 transectionStatus: true,
                 transectionId: transectionId,
                 totalAmount: totalAmount
             }
-            await helperService.insertQuery(AllOrderDetailModel, data).then(async(resultdata) => {
+            console.log(data)
+            await helperService.updateQuery(OrderDetailModel, data, paymentData).then(async(resultdata) => {
                 if (result.error) {
                     result = await successResponse(
                         true,
