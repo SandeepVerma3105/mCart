@@ -30,7 +30,7 @@ function verifyToken(req, res, next) {
             )
             res.status(httpStatus.UNAUTHORIZED).json(result)
         } else {
-            req.data = {
+            req.tokenData = {
                 id: decoded.id,
                 email: decoded.email,
                 token: token
@@ -44,8 +44,9 @@ function verifyToken(req, res, next) {
 //valiation for merchant to access apis
 async function parseJwtMerchent(req, res, next) {
     let token = req.headers['accesstoken']
-    const data = jwtDecode(token)
-    if (data.role != "merchant" && data.role != "admin") {
+    const tokenData = jwtDecode(token)
+    req.tokenData = tokenData
+    if (tokenData.role != "merchant" && tokenData.role != "admin") {
         result = await successResponse(
             true,
             null,
@@ -64,9 +65,9 @@ async function parseJwtMerchent(req, res, next) {
 //valiation for admin to access apis
 async function parseJwtAdmin(req, res, next) {
     let token = req.headers['accesstoken']
-    const data = jwtDecode(token)
-    console.log(data)
-    if (data.role != "admin") {
+    const tokenData = jwtDecode(token)
+    req.tokenData = tokenData
+    if (tokenData.role != "admin") {
         result = await successResponse(
             true,
             null,
@@ -84,8 +85,10 @@ async function parseJwtAdmin(req, res, next) {
 
 async function parseJwtCustomer(req, res, next) {
     let token = req.headers['accesstoken']
-    const data = jwtDecode(token)
-    if (data.role != "customer" && data.role != "admin") {
+    tokenData = jwtDecode(token)
+    req.tokenData = tokenData
+    console.log("dfdd", tokenData)
+    if (tokenData.role != "customer" && tokenData.role != "admin") {
         result = await successResponse(
             true,
             null,
@@ -97,7 +100,7 @@ async function parseJwtCustomer(req, res, next) {
         )
         res.status(httpStatus.UNAUTHORIZED).json(result)
     } else {
-        next()
+        return next()
     }
 }
 

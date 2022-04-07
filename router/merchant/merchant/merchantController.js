@@ -118,7 +118,7 @@ const Login = async(req, res) => {
         )
         res.status(httpStatus.UNAUTHORIZED).json(result)
     } else {
-        let token = jwtToken(getdata.email, "merchant")
+        let token = jwtToken(getdata[0].email, "merchant", getdata[0]._id)
         result = await successResponse(
             true, {
                 _id: getdata[0]._id,
@@ -209,7 +209,7 @@ const updateProfile = async(req, res, next) => {
 const updateAddress = async(req, res) => {
     data = req.item
     id = req.query.addressId
-    merchantId = req.query.merchantId
+    merchantId = req.tokenData.id
     getdata = await helperService.updateQuery(MerchantModel, { _id: id, merchantId: merchantId }, data)
     if (getdata.error) {
         result = await successResponse(
@@ -252,12 +252,38 @@ const updateAddress = async(req, res) => {
     }
 }
 
+const addAddress = async(req, res) => {
+    data = req.body
+    addressId = await KEY.random_key()
+    await helperService.insertQuery(MerchantAddressModel, {
+        merchantId: req.tokenData.id,
+        houseNo: data.houseNo,
+        colony: data.colony,
+        pinCode: data.pinCode,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+        _id: ObjectID(addressId)
+    }).then(async(resultData) => {
+        await helperService.updateByIdQuery(MerchantAddressModel, req.tokenData.id, { $push: { address: [resultData[0]._id] } }).then(async(resultData) => {
+            result = await successResponse(
+                true,
+                resultData,
+                httpStatus.OK, "",
+                constents.ADDRESS_ADDED
+            )
+            res.status(httpStatus.OK).json(result)
+        })
+    }).catch(async(err) => {
 
+    })
+}
 
 module.exports = {
     signUp,
     Login,
     profile,
     updateProfile,
-    updateAddress
+    updateAddress,
+    addAddress
 }

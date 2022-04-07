@@ -11,5 +11,5 @@ route.get("/profile", verifyToken.verifyToken, verifyToken.parseJwtMerchent, req
 route.put("/update", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.id, "query"), requestValidator(merchantSchema.update), merchantController.updateProfile)
 route.put("updateAddress", verifyToken.verifyToken, verifyToken.parseJwtMerchent, merchantController.updateAddress)
 route.delete("/delete", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.id, "query"), requestValidator(merchantSchema.del), merchantController.updateProfile)
-
+route.post("/addAddress", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.addAddress), merchantController.addAddress)
 module.exports = route

@@ -27,7 +27,6 @@ const signIn = joi.object().keys({
 })
 
 const placeOrder = joi.object().keys({
-    userId: joi.string().min(24).max(24).required(),
     productId: joi.string().min(24).max(24).required(),
     unit: joi.number().min(1).required(),
     discount: joi.number().min(0).max(100),
@@ -36,7 +35,6 @@ const placeOrder = joi.object().keys({
 })
 
 const addCart = joi.object().keys({
-    userId: joi.string().min(24).max(24).required(),
     productId: joi.string().min(24).max(24).required(),
     unit: joi.number().min(1).required(),
     baseCost: joi.number().min(1).required(),

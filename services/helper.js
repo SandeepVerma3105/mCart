@@ -60,6 +60,7 @@ const insertQuery = async(model, data, res) => {
 }
 
 const updateByIdQuery = async(model, qury, data, res) => {
+    console.log(qury, data)
     try {
         res = await model.findByIdAndUpdate(qury, data)
         if (res == null) {

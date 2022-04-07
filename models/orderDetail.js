@@ -13,6 +13,11 @@ const orderSchema = mongoose.Schema({
         required: true,
         ref: "userAddress"
     },
+    merchantId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: "product",
+    },
     productId: {
         type: Schema.Types.ObjectId,
         required: true,
