@@ -136,7 +136,10 @@ const Login = async(req, res) => {
 const profile = async(req, res, next) => {
     data = req.query
     qury = { _id: req.tokenData.id }
-    getdata = await helperService.populateQuery(MerchantModel, qury, field = ["address._id"])
+    let field = [
+        { path: "address._id", model: "merchantAddress", select: ["houseNo", "colony", "pinCode", "city", "state", "country", "merchantId"] },
+    ]
+    getdata = await helperService.populateQuery(MerchantModel, qury, field)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -264,8 +267,9 @@ const addAddress = async(req, res) => {
         country: data.country,
         _id: ObjectID(addressId)
     }).then(async(resultData) => {
-        console.log(resultData)
-        await helperService.updateByIdQuery(MerchantModel, req.tokenData.id, { $pull: { address: resultData[0]._id } }).then(async(resultData) => {
+        console.log("hshkjs", resultData[0].id)
+        adId = resultData[0].id
+        await helperService.updateByIdQuery(MerchantModel, req.tokenData.id, { $push: { address: { _id: adId } } }).then(async(resultData) => {
             result = await successResponse(
                 true,
                 resultData,

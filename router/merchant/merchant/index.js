@@ -12,4 +12,5 @@ route.put("/update", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requ
 route.put("updateAddress", verifyToken.verifyToken, verifyToken.parseJwtMerchent, merchantController.updateAddress)
 route.delete("/delete", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.del), merchantController.updateProfile)
 route.post("/addAddress", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.addAddress), merchantController.addAddress)
+route.delete("/deleteAddress", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.del), merchantController.updateProfile)
 module.exports = route
