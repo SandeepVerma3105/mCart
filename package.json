@@ -21,6 +21,7 @@
         "helmet": "^5.0.2",
         "http-status": "^1.5.0",
         "joi": "^13.6.0",
+        "joi-country": "^0.1.1",
         "joi-date-extensions": "^1.2.0",
         "jsonwebtoken": "^8.5.1",
         "jwt-decode": "^3.1.2",

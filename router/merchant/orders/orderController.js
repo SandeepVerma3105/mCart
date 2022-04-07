@@ -12,10 +12,20 @@ const helperService = require("../../../services/helper")
 const { successResponse } = require("../../../response/success")
 
 const orders = async(req, res) => {
+    req.query.merchantId = req.tokenData.id
     field = [{ path: "productId", model: "product", select: ["_id", "name"] },
         // {  path: "userId",  model: "user",select: ["firstName", "lastName",]},
     ]
+    if (req.query._id) {
+        field = [
+            { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
+            { path: "productId", model: "product", select: ["name"] },
+            { path: "userAddressId", model: "userAddress" },
+            { path: "merchantId", model: "merchant" }
+        ]
+    }
     getdata = await helperService.populateQuery(OrderDetailModel, req.query, field)
+    console.log(getdata)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -66,7 +76,7 @@ const changeOrederStatus = async(req, res) => {
         res.status(httpStatus.BAD_REQUEST).json(result)
         return
     }
-    getdata = await helperService.updateByIdQuery(OrderDetailModel, data.orderId, { orderStatus: data.status })
+    getdata = await helperService.updateQuery(OrderDetailModel, { _id: data.orderId, merchantId: req.tokenData.id }, { orderStatus: data.status })
     console.log(getdata)
     if (getdata.reason) {
         result = await successResponse(
@@ -106,6 +116,7 @@ const changeOrederStatus = async(req, res) => {
 
 
 const acceptOrder = async(req, res) => {
+    data = req.body
     checkUnit = await helperService.populateQuery(
         OrderDetailModel, { _id: data.orderId }, {
             path: "productId",
@@ -126,7 +137,7 @@ const acceptOrder = async(req, res) => {
         )
         res.status(httpStatus.NOT_FOUND).json(result)
     }
-    if (checkUnit[0].productId.unit >= checkUnit[0].unit) {
+    if (checkUnit.length > 0 && checkUnit[0].productId.unit >= checkUnit[0].unit) {
         getdata = await helperService.updateByIdQuery(
             OrderDetailModel,
             data.orderId, { orderStatus: 2 }
@@ -167,7 +178,7 @@ const acceptOrder = async(req, res) => {
             res.status(httpStatus.OK).json(result)
         }
     }
-    if (checkUnit[0].productId.unit <= checkUnit[0].unit) {
+    if (checkUnit.length > 0 && checkUnit[0].productId.unit <= checkUnit[0].unit) {
         result = await successResponse(
             true, {
                 productQuantity: checkUnit[0].productId.unit,
@@ -185,9 +196,16 @@ const acceptOrder = async(req, res) => {
 
 const ordersDetail = async(req, res) => {
     field = [
-        // { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
         { path: "productId", model: "product", select: ["name"] },
     ]
+
+    if (req.query._id) {
+        field = [
+            { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
+            { path: "productId", model: "product", select: ["name"] },
+            { path: "usarAddressId", model: "userAddress" },
+        ]
+    }
 
     getdata = await helperService.populateQuery(OrderDetailModel, req.query, field)
     if (getdata.error) {

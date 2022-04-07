@@ -67,7 +67,7 @@ const brands = async(req, res) => {
 
 const addProduct = async(req, res, next) => {
     data = req.item
-    let getmerchant = await helperService.findQuery(MerchantModel, { _id: data.merchantId })
+    let getmerchant = await helperService.findQuery(MerchantModel, { _id: req.tokenData.id })
     if (getmerchant.length > 0) {
         if (data.discount) {
             disCost = data.baseCost - (data.baseCost * (data.discount / 100))
@@ -75,13 +75,14 @@ const addProduct = async(req, res, next) => {
             disCost = 0
         }
         let getdata = await helperService.insertQuery(ProductModel, {
-            merchantId: data.merchantId,
+            merchantId: req.tokenData.id,
             categoryId: data.categoryId,
             brandId: data.brandId,
             name: data.name,
             sortDescription: data.sortDescription,
             longDescription: data.longDescription,
             unit: data.unit,
+            image: data.image,
             baseCost: data.baseCost,
             discountCost: disCost,
             discount: data.discount,
@@ -125,31 +126,37 @@ const addProduct = async(req, res, next) => {
 }
 
 const getProduct = async(req, res) => {
+    req.query.merchantId = req.tokenData.id
     let field = [
         { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "email"] },
         { path: "categoryId", model: "category", select: ["_id", "name", "lastName"] },
         { path: "brandId", model: "brand", select: ["_id", "name", "lastName"] }
     ]
-    data = req.query
     if (!req.query) {
         req.query = req.query
     }
-    // if (req.query.productId) {
-    //     req.query._id = req.query.productId
-    // }
-    if (req.query.merchantId) {
-        req.query.merchantId = req.query.merchantId
+    if (req.query.productId) {
+        req.query._id = req.query.productId
     }
+
     if (req.query.globalSearchString) {
         req.query.$text = { $search: req.query.globalSearchString }
     }
     if (req.query.searchString) {
-        req.query.categoryId = { $regex: '.*' + req.query.searchString + '.*', "$options": 'i' }
+        req.query.name = { $regex: '.*' + req.query.searchString + '.*', "$options": 'i' }
 
     }
-    // $search: req.query.globalSearchString, "$option": 'i'
     getdata = await helperService.populateQuery(ProductModel, req.query, field)
     console.log(getdata)
+    if (getdata == 0) {
+        result = await successResponse(
+            true, { data: [], count: 0 },
+            httpStatus.OK,
+            "",
+            constents.PRODUCT_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -161,7 +168,8 @@ const getProduct = async(req, res) => {
             ""
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-    } else {
+    }
+    if (getdata.length > 0) {
         result = await successResponse(
             true, { data: getdata, count: getdata.count },
             httpStatus.OK,
@@ -175,7 +183,7 @@ const getProduct = async(req, res) => {
 const updateProduct = async(req, res, next) => {
     data = req.body
     data.updatedAt = new Date()
-    qury = { _id: req.query.productId, merchantId: req.query.merchantId }
+    qury = { _id: req.query.productId, merchantId: req.tokenData.id }
     getdata = await helperService.updateQuery(ProductModel, qury, data)
     if (getdata.error) {
         result = await successResponse(

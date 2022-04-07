@@ -29,6 +29,8 @@ module.exports = message = {
     EMPTY_FIELDS: "no data found in request body",
 
     USER_NOT_EXIST: "invalid user Id",
+
+    CARD_LIST: "find your card list here",
     CARD_ADDED: "card has been added succesfully",
     CARD_EXIST: "card allready exist please use diffrent",
     CARD_DETAIL_UPDATED: "your card detail has been updated successfully",
@@ -56,12 +58,14 @@ module.exports = message = {
 
     QUANTITY: "order product quantity should be less then acctual product quantity",
     ORDER_PLACED: "your order has been placed",
-    ORDER_ACCEPTED: "order state has been changed ACCEPTED",
-    ORDER_CANCEL: "order state has been CANCELLED",
-    ORDER_IN_TRANSIT: "order state is in transit now",
+    ORDER_ACCEPTED: "order status has been changed ACCEPTED",
+    ORDER_CANCEL: "order status has been CANCELLED",
+    ORDER_IN_TRANSIT: "order status is in transit now",
     ORDER_DELEVERED: "order has delivered now",
+    ORDER_PENDING: "order status is pending",
     INVALID_ORDER_STATUS: "please enter a valid status, 1 for PENDING, 3 for CANCEL, 4 for IN TRANSIT, 5 for DELIVERED ",
 
-    CUSTOMER_VALIDATION: "you are not a valid customer"
+    CUSTOMER_VALIDATION: "you are not a valid customer",
 
+    ADDRESS_ADDED: "address added successfully"
 }

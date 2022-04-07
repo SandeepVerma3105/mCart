@@ -89,7 +89,7 @@ const paymentDetail = async(req, res, next) => {
 
 const paymentList = async(req, res, next) => {
     data = req.query
-    getdata = await helperService.findQuery(PaymentModel, { userId: data.userId })
+    getdata = await helperService.findQuery(PaymentModel, { userId: req.tokenData.id })
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -102,11 +102,15 @@ const paymentList = async(req, res, next) => {
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
     } else {
-        res.status(httpStatus.OK).json({
-            success: true,
-            status: httpStatus.OK + " OK",
-            data: getdata
-        })
+        result = await successResponse(
+            true, {
+                getUserData,
+
+            },
+            httpStatus.OK,
+            "",
+            constents.CARD_LIST)
+        res.status(httpStatus.OK).json(result)
     }
 }
 
@@ -153,6 +157,7 @@ const updatepayment = async(req, res, next) => {
 
 const deletepayment = async(req, res, next) => {
     data = req.params.id
+    data.userId = req.tokenData.id
     getdata = await PaymentModel.deleteOne({ _id: ObjectID(data) })
     if (getdata.error) {
         result = await successResponse(
@@ -196,12 +201,12 @@ const makePayment = async(req, res) => {
         { path: "userAddressId", model: "userAddress", select: ["_id", "houseNo", "state", "pinCode"] },
     ]
     transectionId = await KEY.random_key()
-    await helperService.populateQuery(OrderDetailModel, { userId: data.userId, _id: data.orderId }, field)
+    await helperService.populateQuery(OrderDetailModel, { userId: req.tokenData.id, _id: data.orderId }, field)
 
     .then(async(result) => {
-        totalAmount = (result[0].baseCost * result[0].unit) + ((result[0].baseCost * result[0].unit) * result[0].discount) / 100
         console.log(result)
         if (result != 0) {
+            totalAmount = (result[0].baseCost * result[0].unit) + ((result[0].baseCost * result[0].unit) * result[0].discount) / 100
             paymentData = {
                 paymentKey: data.paymentKey,
                 transectionStatus: true,

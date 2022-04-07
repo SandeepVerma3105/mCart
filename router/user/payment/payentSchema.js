@@ -3,7 +3,6 @@ const Extension = require('joi-date-extensions');
 const Joid = joi.extend(Extension);
 const pattern = require("../../../utils/regex")
 const paymentDetail = joi.object().keys({
-    userId: joi.string().required().min(24).max(24),
     cardNo: joi.string().min(16).max(16).required().regex(pattern.num),
     cardName: joi.string().required().regex(pattern.strPattern),
     cardHolderName: joi.string().required().regex(pattern.strPattern),
@@ -23,8 +22,8 @@ const id = joi.object().keys({
 })
 
 const payment = joi.object().keys({
-    userId: joi.string().min(24).max(24),
-    orderId: joi.string().min(24).max(24)
+    orderId: joi.string().min(24).max(24),
+    paymentKey: joi.string().min(9).max(9)
 })
 
 

@@ -61,9 +61,8 @@ const signUp = async(req, res, next) => {
         if (getUserData.length > 0) {
 
             let { houseNo, colony, pinCode, city, state, country } = req.body.address
-            console.log("hdhashda", data.houseNo)
             let addresses = await helperService.insertQuery(UserAddressModel, {
-                merchantId: getUserData._id,
+                userId: getUserData._id,
                 houseNo: houseNo,
                 colony: colony,
                 pinCode: pinCode,
@@ -151,8 +150,7 @@ const signIn = async(req, res) => {
             )
             res.status(httpStatus.UNAUTHORIZED).json(result)
         } else {
-            console.log(getdata)
-            let token = jwtToken(getdata.phoneNumber, "customer")
+            let token = jwtToken(getdata[0].phoneNumber, "customer", getdata[0]._id)
             result = await successResponse(
                 true, {
                     _id: getdata[0]._id,
@@ -205,28 +203,38 @@ const getnerateOTP = async(req, res) => {
 }
 
 const getProduct = async(req, res) => {
-
-    req.body.isDelete = false
+    req.query.isDelete = false
+    req.query.status = false
+    console.log(req.query)
     let field = [
-        { path: "categoryId", model: "category", select: ["name"] }
+        { path: "categoryId", model: "category", select: ["name"] },
+        { path: "brandId", model: "brand", select: ["_id", "name"] },
     ]
-    data = req.body
+    data = req.query
     if (!req.query) {
         req.body = req.body
     }
 
     if (req.query.productId) {
-        req.body._id = req.query.productId
+        req.query._id = req.query.productId
     }
-    if (req.body.globalSearchString) {
-        req.body.$text = { $search: req.body.globalSearchString }
+    if (req.query.globalSearchString) {
+        req.query.$text = { $search: req.query.globalSearchString }
     }
-    if (req.body.searchString) {
-        req.body.name = { $regex: '.*' + req.body.searchString + '.*' }
+    if (req.query.searchString) {
+        req.query.name = { $regex: '.*' + req.query.searchString + '.*', "$options": 'i' }
 
     }
-    getdata = await helperService.populateQuery(ProductModel, req.body, field)
-    console.log(getdata)
+    getdata = await helperService.populateQuery(ProductModel, req.query, field)
+    if (getdata == 0) {
+        result = await successResponse(
+            true, { data: [], count: 0 },
+            httpStatus.OK,
+            "",
+            constents.PRODUCT_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -238,7 +246,8 @@ const getProduct = async(req, res) => {
             ""
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-    } else {
+    }
+    if (getdata.length > 0) {
         result = await successResponse(
             true, { data: getdata, count: getdata.count },
             httpStatus.OK,
@@ -253,9 +262,20 @@ const addCart = async(req, res) => {
     data = req.item
         // data.userId = req.query.userId
     getData = await helperService.findQuery(ProductModel, { _id: data.productId })
+    if (getData == 0) {
+        result = await successResponse(
+            true, "",
+            httpStatus.NOT_FOUND, {
+                errCode: errors.DATA_NOT_FOUND.status,
+                errMsg: constents.DATA_NOT_FOUND
+            },
+            ""
+        )
+        res.status(httpStatus.OK).json(result)
+    }
     if (getData[0].unit >= data.unit) {
         getdata = await helperService.insertQuery(CartModel, {
-            userId: data.userId,
+            userId: req.tokenData.id,
             productId: data.productId,
             unit: data.unit,
             baseCost: data.baseCost,
@@ -303,17 +323,17 @@ const addCart = async(req, res) => {
 
 const placeOrder = async(req, res) => {
     data = req.item
-    data.userId = req.query.userId
     getData = await helperService.findQuery(ProductModel, { _id: data.productId })
     console.log(data, getData)
     if (getData.length > 0 && getData[0].unit >= data.unit) {
         getdata = await helperService.insertQuery(OrderDetailModel, {
-            userId: req.query.userId,
+            userId: req.tokenData.id,
             productId: data.productId,
             unit: data.unit,
             discount: getData[0].discount,
             baseCost: getData[0].baseCost,
-            userAddressId: data.addressId
+            userAddressId: data.addressId,
+            merchantId: getData[0].merchantId
 
         })
         if (getdata.errors) {
@@ -333,7 +353,7 @@ const placeOrder = async(req, res) => {
             unit = getData[0].unit - data.unit
         updateQuantity = await helperService.updateQuery(ProductModel, { _id: data.productId }, { unit: unit })
             .then(async() => {
-                deleteData = await CartModel.deleteOne({ _id: data.productId, userId: data.userId })
+                deleteData = await CartModel.deleteOne({ _id: data.productId, userId: req.tokenData.id })
             })
             .then(async() => {
                 result = await successResponse(
@@ -393,9 +413,12 @@ const trackOrder = async(req, res) => {
     data = req.item
     data.orderStatus != 5
     field = [
-        { path: "produtId", model: "product", select: ["_id", "name", "description", "longDescription"] },
+        { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
+        { path: "productId", model: "product", select: ["name"] },
+        { path: "userAddressId", model: "userAddress" },
+        { path: "merchantId", model: "merchant" }
     ]
-    getdata = await helperService.populateQuery(OrderDetailModel, { userId: ObjectID(data.id) })
+    getdata = await helperService.populateQuery(OrderDetailModel, { userId: req.tokenData.id }, field)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -423,7 +446,7 @@ const orderHistory = async(req, res) => {
     field = [
         { path: "produtId", model: "product", select: ["_id", "name", "description", "longDescription"] },
     ]
-    getdata = await helperService.populateQuery(OrderDetailModel, { userId: ObjectID(data.id) })
+    getdata = await helperService.populateQuery(OrderDetailModel, { userId: req.tokenData.id })
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -448,8 +471,7 @@ const orderHistory = async(req, res) => {
 
 const updateUnit = async(req, res) => {
     data = req.body
-    userId = req.query.userId
-    await helperService.findQuery(CartModel, { userId: userId, productId: data.productId })
+    await helperService.findQuery(CartModel, { userId: req.tokenData.id, productId: data.productId })
         .then(async(result) => {
             if (result.length > 0) {
                 unit = result[0].unit + data.unit
