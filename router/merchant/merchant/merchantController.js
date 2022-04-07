@@ -209,8 +209,7 @@ const updateProfile = async(req, res, next) => {
 const updateAddress = async(req, res) => {
     data = req.item
     id = req.query.addressId
-    merchantId = req.tokenData.id
-    getdata = await helperService.updateQuery(MerchantModel, { _id: id, merchantId: merchantId }, data)
+    getdata = await helperService.updateQuery(MerchantModel, { _id: id, merchantId: req.tokenData.id }, data)
     if (getdata.error) {
         result = await successResponse(
             true,
