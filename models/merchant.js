@@ -30,7 +30,7 @@ const merchantSchema = mongoose.Schema({
         required: true,
         default: "+91"
     },
-    address: [{ type: Schema.Types.ObjectId, ref: "merchantAddress" }],
+    address: [{ id: { type: Schema.Types.ObjectId, ref: "merchantAddress" } }],
     status: {
         type: Boolean,
         default: false
