@@ -151,6 +151,7 @@ const signIn = async(req, res) => {
             res.status(httpStatus.UNAUTHORIZED).json(result)
         } else {
             let token = jwtToken(getdata[0].phoneNumber, "customer", getdata[0]._id)
+            await OtpModel.remove({ phoneNumber: getdata[0].phoneNumber })
             result = await successResponse(
                 true, {
                     _id: getdata[0]._id,

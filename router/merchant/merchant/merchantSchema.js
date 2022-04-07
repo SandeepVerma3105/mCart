@@ -22,6 +22,7 @@ const signUp = joi.object().keys({
 
 const update = joi.object().keys({
     firstName: joi.string().min(3).regex(pattern.strPattern),
+    email: joi.string().email(),
     lastName: joi.string().min(3).regex(pattern.strPattern),
     phoneNumber: joi.string().length(10).regex(pattern.mobileNoPattern),
     countryCode: joi.string().max(5).min(2).regex(pattern.conturyCodePatter),
