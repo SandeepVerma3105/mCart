@@ -21,7 +21,7 @@ const orders = async(req, res) => {
             { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
             { path: "productId", model: "product", select: ["name"] },
             { path: "userAddressId", model: "userAddress" },
-            { path: "merchantId", model: "merchant", select: ["-address"] }
+            { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "phoneNumber", "email"] }
         ]
     }
     getdata = await helperService.populateQuery(OrderDetailModel, req.query, field)
@@ -211,7 +211,7 @@ const ordersDetail = async(req, res) => {
         field = [
             { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
             { path: "productId", model: "product", select: ["name"] },
-            { path: "usarAddressId", model: "userAddress" },
+            { path: "userAddressId", model: "userAddress" },
         ]
     }
 
@@ -227,7 +227,17 @@ const ordersDetail = async(req, res) => {
             ""
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-    } else {
+    }
+    if (getdata == 0) {
+        result = await successResponse(
+            true, { data: [], count: 0 },
+            httpStatus.OK,
+            "",
+            constents.ORDER_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+    if (getdata.length > 0) {
         result = await successResponse(
             true, { data: getdata, count: getdata.count },
             httpStatus.OK,
