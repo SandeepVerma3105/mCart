@@ -135,7 +135,7 @@ const Login = async(req, res) => {
 
 const profile = async(req, res, next) => {
     data = req.query
-    qury = { _id: req.query.id }
+    qury = { _id: req.tokenData.id }
     getdata = await helperService.populateQuery(MerchantModel, qury, field = ["address"])
     if (getdata.error) {
         result = await successResponse(
