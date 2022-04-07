@@ -7,6 +7,6 @@ module.exports = pattern = {
     num: /^[0-9]+$/,
     cvvPattern: /^[0-9]{3}$/,
     productPattern: /^[A-Z]+([a-z ]+)?([0-9]+)? ?$/,
-    size: /^[MLX]{1}|{XL}|{XXL}$/,
+    size: /^[SMLX]{1}|{XL}|{XXL}$/,
     state: /^[A-Z]+[A-Za-z ]*[0-9]*$/
 }
