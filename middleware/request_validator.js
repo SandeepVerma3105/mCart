@@ -9,7 +9,7 @@ const requestValidator = (schema, property = "body") => async(req, res, next) =>
     data = req[property]
     try {
         req.item = await Joi.validate(data, schema, {
-            stripUnknown: { arrays: true },
+            stripUnknown: { objects: true, arrays: true },
             convert: true,
             abortEarly: false
         });
