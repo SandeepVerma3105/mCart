@@ -7,7 +7,7 @@ const addProduct = joi.object().keys({
     sortDescription: joi.string().required().min(5).max(50).regex(pattern.productPattern),
     logDescription: joi.string().min(50).max(150).regex(pattern.productPattern),
     unit: joi.number().integer().required(),
-    image: joi.string().required(),
+    image: joi.string(),
     baseCost: joi.number().required().min(0),
     discount: joi.number().min(0).max(80),
     size: joi.string().min(1).regex(pattern.size),
