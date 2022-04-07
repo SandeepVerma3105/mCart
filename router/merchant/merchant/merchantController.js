@@ -162,7 +162,7 @@ const profile = async(req, res, next) => {
 
 const updateProfile = async(req, res, next) => {
     data = req.body
-    id = req.query.id
+    id = req.tokenData.id
     console.log(id, data)
     getdata = await helperService.updateByIdQuery(MerchantModel, id, data)
     if (getdata.error) {
