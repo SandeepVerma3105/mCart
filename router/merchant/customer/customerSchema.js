@@ -14,8 +14,15 @@ const status = joi.object().keys({
 const userId = joi.object().keys({
     userId: joi.string().required().max(24).min(24),
 })
+
+const customerId = joi.object().keys({
+    customerId: joi.string().required().min(24).max(24),
+    status: joi.boolean().required()
+})
+
 module.exports = {
     id,
     status,
-    userId
+    userId,
+    customerId
 }

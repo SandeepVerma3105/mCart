@@ -37,6 +37,15 @@ const addAddress = joi.object().keys({
     state: joi.string().required().regex(pattern.strPattern),
     country: joi.string().required().regex(pattern.strPattern),
 })
+const updateAddress = joi.object().keys({
+    houseNo: joi.string().regex(pattern.strPattern),
+    colony: joi.string().regex(pattern.strPattern),
+    landMark: joi.string().regex(pattern.strPattern),
+    pinCode: joi.string().max(6).min(6).regex(pattern.num),
+    city: joi.string().regex(pattern.strPattern),
+    state: joi.string().regex(pattern.strPattern),
+    country: joi.string().regex(pattern.strPattern),
+})
 const id = joi.object().keys({
     id: joi.string().required().min(24).max(24)
 })
@@ -46,8 +55,7 @@ const logIn = joi.object().keys({
     password: joi.string().required()
 })
 const updateIds = joi.object().keys({
-    addressId: joi.string().email().required().min(24).max(24),
-    merchantId: joi.string().required().min(24).max(24)
+    addressId: joi.string().required().min(24).max(24),
 })
 
 const del = joi.object().keys({
@@ -61,5 +69,6 @@ module.exports = {
     logIn,
     del,
     updateIds,
-    addAddress
+    addAddress,
+    updateAddress
 }

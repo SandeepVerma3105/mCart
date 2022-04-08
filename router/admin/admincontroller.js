@@ -19,6 +19,7 @@ const KEY = require("../../utils/randamKey")
 const helperService = require("../../services/helper")
 const otp = require("../../utils/otp")
 const { successResponse } = require("../../response/success")
+const { SizeModel } = require("../../models/size")
 
 
 
@@ -321,6 +322,67 @@ const addBrand = async(req, res, next) => {
     })
 }
 
+const size = async(req, res, next) => {
+    data = req.item
+    console.log(data)
+    await helperService.findQuery(CategoryModel, { _id: req.item.categoryId }).then(async(result) => {
+        if (result.length > 0) {
+            getdata = await helperService.findQuery(SizeModel, { size: data.name })
+            if (getdata.length > 0) {
+                result = await successResponse(
+                    true,
+                    null,
+                    httpStatus.OK, {
+                        errCode: errors.CONFLICT.status,
+                        errMsg: constents.SIZE_EXIST
+                    },
+                    ""
+                )
+                res.status(httpStatus.CONFLICT).json(result)
+            }
+            if (getdata == 0) {
+                let getSize = await helperService.insertQuery(SizeModel, {
+                    categoryId: data.categoryId,
+                    size: data.size,
+                })
+                if (getSize.errors) {
+                    result = await successResponse(
+                        true,
+                        null,
+                        httpStatus.OK, {
+                            errCode: errors.INTERNAL_SERVER_ERROR.status,
+                            errMsg: constents.INTERNAL_SERVER_ERROR
+                        },
+                        ""
+                    )
+                    res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+                }
+                if (getSize.length > 0)
+                    result = await successResponse(
+                        true,
+                        getSize[0],
+
+                        httpStatus.OK,
+                        "",
+                        constents.SIZE_ADDED)
+                res.status(httpStatus.OK).json(result)
+            }
+        }
+    }).catch(async(err) => {
+        console.log(err)
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    })
+}
+
 
 
 module.exports = {
@@ -329,5 +391,6 @@ module.exports = {
     addMerchant,
     addCategory,
     addBrand,
-    blockMerchant
+    blockMerchant,
+    size
 }

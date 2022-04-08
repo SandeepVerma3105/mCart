@@ -41,10 +41,15 @@ const del = joi.object().keys({
     isDelete: joi.boolean().required(),
 })
 
+const categoryId = joi.object().keys({
+    categoryId: joi.string().min(24).max(24)
+})
+
 module.exports = {
     addProduct,
     merchantId,
     productId,
     updateProduct,
-    del
+    del,
+    categoryId
 }

@@ -11,7 +11,7 @@ const category = joi.object().keys({
     description: joi.string().required().regex(pattern.strPattern)
 })
 const brand = joi.object().keys({
-    categoryId: joi.string().min(24).max(24),
+    categoryId: joi.string().min(24).max(24).required(),
     name: joi.string().required().regex(pattern.strPattern),
     description: joi.string().required().regex(pattern.strPattern)
 })
@@ -31,11 +31,17 @@ const block = joi.object().keys({
     status: joi.boolean().required(),
 })
 
+const size = joi.object().keys({
+    categoryId: joi.string().min(24).max(24).required(),
+    size: joi.string().required(),
+})
+
 module.exports = {
     category,
     brand,
     credeintial,
     email,
     addMerchant,
-    block
+    block,
+    size
 }
