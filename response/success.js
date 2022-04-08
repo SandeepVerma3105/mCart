@@ -1,5 +1,7 @@
-const successResponse = async(status, response = "null", code, error, message, data) => {
-
+const successResponse = async(status, response = "null", code, error = "null", message, data) => {
+    if (error == "") {
+        error = null
+    }
     data = {
         "status": status,
         "response": response,
