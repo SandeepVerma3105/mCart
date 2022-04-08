@@ -5,11 +5,14 @@ const { ProductModel } = require("../../../models/product")
 const { MerchantModel } = require("../../../models/merchant")
 const { MerchantAddressModel } = require("../../../models/merchantAddress")
 const { UserModel } = require("../../../models/user")
+const { MerchantBlockedCustomerModel } = require("../../../models/merchantBlockedCustomer")
 
 const constents = require("../../../constents/constent")
 const errors = require("../../../error/error")
 const helperService = require("../../../services/helper")
+const MerchantBlockedCustomerService = require("../../../services/merchantBlockedCustomer")
 const { successResponse } = require("../../../response/success")
+
 
 const customers = async(req, res) => {
     getdata = await helperService.findQuery(UserModel, req.body)
@@ -64,8 +67,18 @@ const customerDetail = async(req, res) => {
 
 const blockCustomer = async(req, res) => {
     data = req.item
-    console.log(data)
-    getdata = await helperService.updateByIdQuery(UserModel, data.customerId, { customerStatus: data.status })
+
+    console.log("status", data.status)
+    if (data.status == true) {
+        opt = `$push`
+    }
+    if (data.status == false) {
+        opt = `$pull`
+    }
+
+    getdata = await MerchantBlockedCustomerService.updateQuery(MerchantBlockedCustomerModel, { merchant: req.tokenData.id }, {
+        [opt]: { customer: { _id: data.customerId } }
+    })
     if (getdata.reason) {
         result = await successResponse(
             true,

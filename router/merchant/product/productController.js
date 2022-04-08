@@ -10,6 +10,8 @@ const constents = require("../../../constents/constent")
 const errors = require("../../../error/error")
 const helperService = require("../../../services/helper")
 const { successResponse } = require("../../../response/success")
+const { SizeModel } = require("../../../models/size")
+const { SIZE_LIST } = require("../../../constents/constent")
 
 const category = async(req, res) => {
     getdata = await helperService.findQuery(CategoryModel, req.query)
@@ -63,6 +65,42 @@ const brands = async(req, res) => {
         res.status(httpStatus.OK).json(result)
     }
 }
+
+const size = async(req, res) => {
+    field = [
+        { path: "categoryId", model: "category", select: ["_id", "name"] },
+    ]
+    getdata = await helperService.populateQuery(SizeModel, req.query, field)
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    }
+    if (getdata == 0) {
+        result = await successResponse(
+            true, { data: [], count: 0 },
+            httpStatus.OK, "",
+            constents.SIZE_LIST
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    } else {
+        result = await successResponse(
+            true, { data: getdata, count: getdata.count },
+            httpStatus.OK,
+            "",
+            constents.SIZE_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+}
+
 
 
 const addProduct = async(req, res, next) => {
@@ -233,5 +271,6 @@ module.exports = {
     getProduct,
     updateProduct,
     category,
-    brands
+    brands,
+    size
 }

@@ -67,5 +67,9 @@ module.exports = message = {
 
     CUSTOMER_VALIDATION: "you are not a valid customer",
 
-    ADDRESS_ADDED: "address added successfully"
+    ADDRESS_ADDED: "address added successfully",
+    ADDRESS_UPDATED: "address updated successfully",
+    SIZE_EXIST: "size allready exist",
+    SIZE_ADDED: "size added succesfully",
+    SIZE_LIST: " find size list here"
 }

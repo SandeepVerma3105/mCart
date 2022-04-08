@@ -11,7 +11,7 @@ const jwtToken = (email, role, id) => {
             id: id
         },
         process.env.SECRET_KEY || SECRET_KEY, {
-            expiresIn: "6000s"
+            expiresIn: "60000s"
         })
     return token
 }

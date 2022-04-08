@@ -212,7 +212,8 @@ const updateProfile = async(req, res, next) => {
 const updateAddress = async(req, res) => {
     data = req.item
     id = req.query.addressId
-    getdata = await helperService.updateQuery(MerchantModel, { _id: id, merchantId: req.tokenData.id }, data)
+    getdata = await helperService.updateQuery(MerchantAddressModel, { _id: id, merchantId: req.tokenData.id }, data)
+    console.log(getdata)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -237,18 +238,12 @@ const updateAddress = async(req, res) => {
         )
         res.status(httpStatus.NOT_FOUND).json(result)
     } else {
-        if (data.isDelete == true) {
-            msg = constents.DELETE_ACCOUNT
-        } else {
-            msg = constents.MERCHANT_UPDATE
-        }
         result = await successResponse(
-            true, {
-                email: getdata.email
-            },
+            true,
+            "",
             httpStatus.OK,
             "",
-            msg
+            constents.ADDRESS_UPDATED
         )
         res.status(httpStatus.OK).json(result)
     }
@@ -267,7 +262,6 @@ const addAddress = async(req, res) => {
         country: data.country,
         _id: ObjectID(addressId)
     }).then(async(resultData) => {
-        console.log("hshkjs", resultData[0].id)
         adId = resultData[0].id
         await helperService.updateByIdQuery(MerchantModel, req.tokenData.id, { $push: { address: { _id: adId } } }).then(async(resultData) => {
             result = await successResponse(
@@ -279,7 +273,17 @@ const addAddress = async(req, res) => {
             res.status(httpStatus.OK).json(result)
         })
     }).catch(async(err) => {
-
+        console.log(err)
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
     })
 }
 

@@ -9,7 +9,7 @@ route.post("/register", requestValidator(merchantSchema.signUp), merchantControl
 route.post("/logIn", requestValidator(merchantSchema.logIn), merchantController.Login)
 route.get("/profile", verifyToken.verifyToken, verifyToken.parseJwtMerchent, merchantController.profile)
 route.put("/update", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.update), merchantController.updateProfile)
-route.put("updateAddress", verifyToken.verifyToken, verifyToken.parseJwtMerchent, merchantController.updateAddress)
+route.put("/updateAddress", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.updateIds, "query"), requestValidator(merchantSchema.updateAddress), merchantController.updateAddress)
 route.delete("/delete", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.del), merchantController.updateProfile)
 route.post("/addAddress", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.addAddress), merchantController.addAddress)
 route.delete("/deleteAddress", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(merchantSchema.del), merchantController.updateProfile)
