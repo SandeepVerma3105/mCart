@@ -87,7 +87,6 @@ async function parseJwtCustomer(req, res, next) {
     let token = req.headers['accesstoken']
     tokenData = jwtDecode(token)
     req.tokenData = tokenData
-    console.log("dfdd", tokenData)
     if (tokenData.role != "customer" && tokenData.role != "admin") {
         result = await successResponse(
             true,

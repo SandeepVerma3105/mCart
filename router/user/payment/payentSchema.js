@@ -22,8 +22,8 @@ const id = joi.object().keys({
 })
 
 const payment = joi.object().keys({
-    orderId: joi.string().min(24).max(24),
-    paymentKey: joi.string().min(9).max(9)
+    orderId: joi.string().min(24).max(24).required(),
+    paymentKey: joi.string().min(9).max(9).required(),
 })
 
 

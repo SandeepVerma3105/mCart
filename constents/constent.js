@@ -5,6 +5,9 @@ module.exports = message = {
 
     UPDATE_QUANTITY: "quantity has beeen updated",
     ADD_CART: "product added into cart",
+    REMOVE_CART: "product has been remove from your cart",
+    CHECK_CART: "find your cart here",
+
     ADD_PEODUCT: "product has been added successfully",
     PRODUCT_LIST: " find product list here",
     UPDATE_PRODUCT: "product detail updated successfully",
@@ -40,6 +43,7 @@ module.exports = message = {
     ORDER_LIST: "find order list here",
     CHANGE_ORDER_STATUS: "order status has been changed",
     PHONE_NUMBER_EXIST: "Phone number allready exist please use diffrent",
+    PHONE_NUMBER_NOT_EXIST: "Phone number not egistered please enter a valid phone number",
     CUSTOMER_SIGNUP: "You have registred successfully",
 
     OTP_SENDED: "OTP has been sent to your phone number  please check",
@@ -69,6 +73,7 @@ module.exports = message = {
 
     ADDRESS_ADDED: "address added successfully",
     ADDRESS_UPDATED: "address updated successfully",
+    ADDRESS_LIST: "find your address here",
     SIZE_EXIST: "size allready exist",
     SIZE_ADDED: "size added succesfully",
     SIZE_LIST: " find size list here"

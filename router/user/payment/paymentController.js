@@ -104,7 +104,7 @@ const paymentList = async(req, res, next) => {
     } else {
         result = await successResponse(
             true, {
-                getUserData,
+                getdata,
 
             },
             httpStatus.OK,
@@ -194,7 +194,6 @@ const deletepayment = async(req, res, next) => {
 
 const makePayment = async(req, res) => {
     data = req.item
-    console.log(data)
     field = [
         { path: "productId", model: "product" },
         { path: "userId", model: "user", select: ["_id", "firstName", "lastName"] },
@@ -204,7 +203,6 @@ const makePayment = async(req, res) => {
     await helperService.populateQuery(OrderDetailModel, { userId: req.tokenData.id, _id: data.orderId }, field)
 
     .then(async(result) => {
-        console.log(result)
         if (result != 0) {
             totalAmount = (result[0].baseCost * result[0].unit) + ((result[0].baseCost * result[0].unit) * result[0].discount) / 100
             paymentData = {
@@ -213,7 +211,6 @@ const makePayment = async(req, res) => {
                 transectionId: transectionId,
                 totalAmount: totalAmount
             }
-            console.log(data)
             await helperService.updateQuery(OrderDetailModel, data, paymentData).then(async(resultdata) => {
                 if (result.error) {
                     result = await successResponse(
