@@ -8,15 +8,20 @@ const { UserAddressModel } = require("../../../models/userAddress")
 const { OtpModel } = require("../../../models/otp")
 const { CartModel } = require("../../../models/cart")
 
+
+
 const constents = require("../../../constents/constent")
 const errors = require("../../../error/error")
 const { jwtToken, parseJwt } = require("../../../utils/jwtToket")
 const KEY = require("../../../utils/randamKey")
 const helperService = require("../../../services/helper")
+const customerMerchantMapping = require("../../../services/customerMerchantMapping")
+const productServices = require("../../../services/productServices")
 const otp = require("../../../utils/otp")
 const { successResponse } = require("../../../response/success")
 const { OrderDetailModel } = require("../../../models/orderDetail")
 const { toInteger } = require("lodash")
+const { CustomerMerchantMapping } = require("../../../models/customerMerchantMapping")
 
 const signUp = async(req, res, next) => {
     data = req.item
@@ -126,8 +131,8 @@ const signIn = async(req, res) => {
         )
         res.status(httpStatus.UNAUTHORIZED).json(result)
     } else {
-        getdata = await helperService.findQuery(OtpModel, { phoneNumber: data.phoneNumber, otp: data.otp })
-        if (getdata.errors) {
+        getOtpData = await helperService.findQuery(OtpModel, { phoneNumber: data.phoneNumber, otp: data.otp })
+        if (getOtpData.errors) {
             result = await successResponse(
                 true,
                 null,
@@ -138,7 +143,7 @@ const signIn = async(req, res) => {
                 ""
             )
             res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-        } else if (getdata == 0) {
+        } else if (getOtpData == 0) {
             result = await successResponse(
                 true,
                 null,
@@ -168,21 +173,44 @@ const signIn = async(req, res) => {
 const getnerateOTP = async(req, res) => {
     data = req.item
     getdata = await helperService.findQuery(UserModel, { phoneNumber: data.phoneNumber })
+    if (getdata.length > 0) {
+        getOtp = await otp.getnerateOTP({ phoneNumber: data.phoneNumber })
+        if (getOtp == 1) {
+            result = await successResponse(
+                true,
+                null,
+                httpStatus.OK, {
+                    errCode: errors.CONFLICT.status,
+                    errMsg: constents.OTP_ALLREADY_SENDED
+                },
+                ""
+            )
+            res.status(httpStatus.CONFLICT).json(result)
+        }
+        if (getOtp.errors) {
+            result = await successResponse(
+                true,
+                null,
+                httpStatus.OK, {
+                    errCode: errors.INTERNAL_SERVER_ERROR.status,
+                    errMsg: constents.INTERNAL_SERVER_ERROR
+                },
+                ""
+            )
+            res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
 
-    getOtp = await otp.getnerateOTP({ phoneNumber: data.phoneNumber })
-    if (getOtp == 1) {
-        result = await successResponse(
-            true,
-            null,
-            httpStatus.OK, {
-                errCode: errors.CONFLICT.status,
-                errMsg: constents.OTP_ALLREADY_SENDED
-            },
-            ""
-        )
-        res.status(httpStatus.CONFLICT).json(result)
+        }
+        if (getOtp.length > 0) {
+            result = await successResponse(
+                true, { otp: getOtp[0].otp, phoneNumber: getOtp[0].phoneNumber },
+                httpStatus.OK,
+                "",
+                constents.OTP_SENDED
+            )
+            res.status(httpStatus.OK).json(result)
+        }
     }
-    if (getOtp.errors) {
+    if (getdata.errors) {
         result = await successResponse(
             true,
             null,
@@ -193,22 +221,27 @@ const getnerateOTP = async(req, res) => {
             ""
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-
-    } else {
+    }
+    if (getdata.length == 0) {
         result = await successResponse(
-            true, { otp: getOtp[0].otp, phoneNumber: getOtp[0].phoneNumber },
-            httpStatus.OK,
-            "",
-            constents.OTP_SENDED
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.BAD_REQUEST.status,
+                errMsg: constents.PHONE_NUMBER_NOT_EXIST
+            },
+            ""
         )
-        res.status(httpStatus.OK).json(result)
+        res.status(httpStatus.UNAUTHORIZED).json(result)
     }
 }
+
+
 
 const updateAddress = async(req, res) => {
     data = req.item
     id = req.query.addressId
-    getdata = await helperService.updateQuery(MerchantAddressModel, { _id: id, merchantId: req.tokenData.id }, data)
+    getdata = await helperService.updateQuery(UserAddressModel, { _id: id, userId: req.tokenData.id }, data)
     console.log(getdata)
     if (getdata.error) {
         result = await successResponse(
@@ -236,7 +269,7 @@ const updateAddress = async(req, res) => {
     } else {
         result = await successResponse(
             true,
-            "",
+            getdata,
             httpStatus.OK,
             "",
             constents.ADDRESS_UPDATED
@@ -248,8 +281,8 @@ const updateAddress = async(req, res) => {
 const addAddress = async(req, res) => {
     data = req.body
     addressId = await KEY.random_key()
-    await helperService.insertQuery(MerchantAddressModel, {
-        merchantId: req.tokenData.id,
+    await helperService.insertQuery(UserAddressModel, {
+        userId: req.tokenData.id,
         houseNo: data.houseNo,
         colony: data.colony,
         pinCode: data.pinCode,
@@ -258,8 +291,9 @@ const addAddress = async(req, res) => {
         country: data.country,
         _id: ObjectID(addressId)
     }).then(async(resultData) => {
-        adId = resultData[0].id
-        await helperService.updateByIdQuery(MerchantModel, req.tokenData.id, { $push: { address: { _id: adId } } }).then(async(resultData) => {
+        console.log(resultData)
+        adId = resultData[0]._id
+        await helperService.updateByIdQuery(UserModel, req.tokenData.id, { $push: { address: { _id: adId } } }).then(async(resultdata) => {
             result = await successResponse(
                 true,
                 resultData,
@@ -283,7 +317,41 @@ const addAddress = async(req, res) => {
     })
 }
 
+const addressList = async(req, res) => {
+    getdata = await helperService.findQuery(CartModel, { userId: req.tokenData.id })
+    if (getdata.length > 0) {
+        result = await successResponse(
+            true, getdata,
+            httpStatus.OK,
+            "",
+            constents.ADDRESS_LIST
+        )
+        res.status(httpStatus.OK).json(result)
 
+    }
+    if (getdata.length == 0) {
+        result = await successResponse(
+            true, { data: [], count: 0 },
+            httpStatus.OK,
+            "",
+            constents.ADDRESS_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+
+    }
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    }
+}
 
 const getProduct = async(req, res) => {
     req.query.isDelete = false
@@ -364,13 +432,43 @@ const addCart = async(req, res) => {
             baseCost: data.baseCost,
 
         })
-        result = await successResponse(
-            true, getdata,
-            httpStatus.OK,
-            "",
-            constents.ADD_CART
-        )
-        res.status(httpStatus.OK).json(result)
+        getdata = await customerMerchantMapping.updateQuery(CustomerMerchantMapping, { merchant: getData[0].merchantId }, {
+            $push: { customer: { _id: req.tokenData.id } }
+        })
+        console.log(getdata)
+        if (getdata.reason) {
+            result = await successResponse(
+                true,
+                null,
+                httpStatus.OK, {
+                    errCode: errors.INTERNAL_SERVER_ERROR.status,
+                    errMsg: constents.INTERNAL_SERVER_ERROR
+                },
+                ""
+            )
+            res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+        }
+        if (getdata == 0) {
+            result = await successResponse(
+                true,
+                null,
+                httpStatus.OK, {
+                    errCode: errors.DATA_NOT_FOUND.status,
+                    errMsg: constents.DATA_NOT_FOUND
+                },
+                ""
+            )
+            res.status(httpStatus.NOT_FOUND).json(result)
+        } else {
+            result = await successResponse(
+                true, getdata,
+                httpStatus.OK,
+                "",
+                constents.ADD_CART
+            )
+            res.status(httpStatus.OK).json(result)
+        }
+
 
     }
     if (getData[0].unit < data.unit) {
@@ -400,8 +498,15 @@ const addCart = async(req, res) => {
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
 
     }
+}
 
-
+const removeCart = async(req, res) => {
+    data = {
+        productId: req.item.productId,
+        userId: req.tokenData.id
+    }
+    getData = await productServices.removeQuery(CartModel, data)
+    console.log("cdsdffsdf", getData)
 }
 
 const placeOrder = async(req, res) => {
@@ -489,6 +594,42 @@ const placeOrder = async(req, res) => {
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
 
+    }
+}
+
+const checkCart = async(req, res) => {
+    getdata = await helperService.findQuery(CartModel, { userId: req.tokenData.id })
+    if (getdata.length > 0) {
+        result = await successResponse(
+            true, getdata,
+            httpStatus.OK,
+            "",
+            constents.CART_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+
+    }
+    if (getdata.length == 0) {
+        result = await successResponse(
+            true, { data: [], count: 0 },
+            httpStatus.OK,
+            "",
+            constents.CART_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+
+    }
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
     }
 }
 
@@ -604,11 +745,16 @@ const updateUnit = async(req, res) => {
 module.exports = {
     signUp,
     signIn,
+    updateAddress,
+    addAddress,
+    addressList,
     getnerateOTP,
     getProduct,
     addCart,
+    removeCart,
+    checkCart,
     placeOrder,
     trackOrder,
     orderHistory,
-    updateUnit
+    updateUnit,
 }

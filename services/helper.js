@@ -14,7 +14,6 @@ const { BrandModel } = require("../models/brand")
     total count of data
     */
 const findQuery = async(model, data = {}, res) => {
-    console.log(data)
     data.isDelete = false
     if (!data.sortKey && !data.order) {
         sort = {}
@@ -50,7 +49,6 @@ const insertQuery = async(model, data, res) => {
     try {
         res = await model.insertMany(data)
         if (res.length > 0) {
-            console.log(res)
             return res
         }
     } catch (error) {

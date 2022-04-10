@@ -7,7 +7,7 @@ const userAddressSchema = mongoose.Schema({
         required: true
     },
     houseNo: {
-        type: Number,
+        type: String,
         required: true
     },
     colony: {
@@ -35,7 +35,7 @@ const userAddressSchema = mongoose.Schema({
     deletedAt: {
         type: Date
     },
-    merchantId: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: "user"
     }

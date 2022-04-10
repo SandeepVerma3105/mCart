@@ -10,12 +10,15 @@ const { MerchantBlockedCustomerModel } = require("../../../models/merchantBlocke
 const constents = require("../../../constents/constent")
 const errors = require("../../../error/error")
 const helperService = require("../../../services/helper")
-const MerchantBlockedCustomerService = require("../../../services/merchantBlockedCustomer")
+const MerchantBlockedCustomerService = require("../../../services/customerMerchantMapping")
 const { successResponse } = require("../../../response/success")
+const { CustomerMerchantMapping } = require("../../../models/customerMerchantMapping")
 
 
 const customers = async(req, res) => {
-    getdata = await helperService.findQuery(UserModel, req.body)
+
+    field = [{ path: "customer._id", model: "user", select: ["-__v", "-createdAt", "-updatedAt", "-address"] }]
+    getdata = await helperService.populateQuery(CustomerMerchantMapping, { merchant: req.tokenData.id }, field)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -37,6 +40,32 @@ const customers = async(req, res) => {
         res.status(httpStatus.OK).json(result)
     }
 }
+const blockedCustomerList = async(req, res) => {
+
+    field = [{ path: "customer._id", model: "user", select: ["-__v", "-createdAt", "-updatedAt", "-address"] }]
+    getdata = await helperService.populateQuery(MerchantBlockedCustomerModel, { merchant: req.tokenData.id }, field)
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    } else {
+        result = await successResponse(
+            true, { data: getdata, count: getdata.count },
+            httpStatus.OK,
+            "",
+            constents.customer_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+}
+
 
 const customerDetail = async(req, res) => {
     req.body._id = req.query.userId
@@ -143,5 +172,6 @@ const blockCustomer = async(req, res) => {
 module.exports = {
     customers,
     blockCustomer,
-    customerDetail
+    customerDetail,
+    blockedCustomerList
 }

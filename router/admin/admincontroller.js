@@ -162,7 +162,7 @@ const addMerchant = async(req, res, next) => {
 const blockMerchant = async(req, res) => {
     data = req.item
     console.log(data)
-    getdata = await helperService.updateByIdQuery(MerchantModel, { _id: data.id }, { status: data.status })
+    getdata = await helperService.updateByIdQuery(MerchantModel, { _id: data.id }, { isDelete: data.status })
     if (getdata.reason) {
         result = await successResponse(
             true,
