@@ -17,7 +17,7 @@ const { CustomerMerchantMapping } = require("../../../models/customerMerchantMap
 
 const customers = async(req, res) => {
 
-    field = [{ path: "customer._id", model: "user", select: ["-__v", "-createdAt", "-updatedAt"] }]
+    field = [{ path: "customer._id", model: "user", select: ["-__v"] }]
     getdata = await helperService.populateQuery(CustomerMerchantMapping, { merchant: req.tokenData.id }, field)
     if (getdata.error) {
         result = await successResponse(
@@ -42,7 +42,7 @@ const customers = async(req, res) => {
 }
 const blockedCustomerList = async(req, res) => {
 
-    field = [{ path: "customer._id", model: "user", select: ["-__v", "-createdAt", "-updatedAt", "-address"] }]
+    field = [{ path: "customer._id", model: "user", select: ["-__v"] }]
     getdata = await helperService.populateQuery(MerchantBlockedCustomerModel, { merchant: req.tokenData.id }, field)
     if (getdata.error) {
         result = await successResponse(
