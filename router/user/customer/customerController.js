@@ -357,27 +357,30 @@ const getProduct = async(req, res) => {
     req.query.isDelete = false
     req.query.status = false
     console.log(req.query)
-    let field = [
-        { path: "categoryId", model: "category", select: ["name"] },
-        { path: "brandId", model: "brand", select: ["_id", "name"] },
-    ]
-    data = req.query
-    if (!req.query) {
-        req.body = req.body
-    }
 
-    if (req.query.productId) {
-        req.query._id = req.query.productId
-    }
-    if (req.query.globalSearchString) {
-        req.query.$text = { $search: req.query.globalSearchString }
-    }
-    if (req.query.searchString) {
-        req.query.name = { $regex: '.*' + req.query.searchString + '.*', "$options": 'i' }
+    getdata = await productServices.aggregateQuery({ _id: req.tokenData.id })
+    console.log("getdata++++++==.>>>", getdata)
+        // let field = [
+        //     { path: "categoryId", model: "category", select: ["name"] },
+        //     { path: "brandId", model: "brand", select: ["_id", "name"] },
+        // ]
+        // data = req.query
+        // if (!req.query) {
+        //     req.body = req.body
+        // }
 
-    }
-    getdata = await helperService.populateQuery(ProductModel, req.query, field)
-    if (getdata == 0) {
+    // if (req.query.productId) {
+    //     req.query._id = req.query.productId
+    // }
+    // if (req.query.globalSearchString) {
+    //     req.query.$text = { $search: req.query.globalSearchString }
+    // }
+    // if (req.query.searchString) {
+    //     req.query.name = { $regex: '.*' + req.query.searchString + '.*', "$options": 'i' }
+
+    // }
+    // getdata = await helperService.populateQuery(ProductModel, req.query, field)
+    if (getdata.length == 0) {
         result = await successResponse(
             true, { data: [], count: 0 },
             httpStatus.OK,
