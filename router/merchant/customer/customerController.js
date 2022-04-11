@@ -17,7 +17,7 @@ const { CustomerMerchantMapping } = require("../../../models/customerMerchantMap
 
 const customers = async(req, res) => {
 
-    field = [{ path: "customer._id", model: "user", select: ["-__v", "-createdAt", "-updatedAt", "-address"] }]
+    field = [{ path: "customer._id", model: "user", select: ["-__v", "-createdAt", "-updatedAt"] }]
     getdata = await helperService.populateQuery(CustomerMerchantMapping, { merchant: req.tokenData.id }, field)
     if (getdata.error) {
         result = await successResponse(
