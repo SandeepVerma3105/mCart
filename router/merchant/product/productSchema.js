@@ -11,7 +11,7 @@ const addProduct = joi.object().keys({
     baseCost: joi.number().required().min(0),
     discount: joi.number().min(0).max(80),
     size: joi.string().min(24).max(24).required(),
-    gender: joi.string().min(4).max(5).regex(pattern.strPattern),
+    gender: joi.string().min(4).max(5).regex(pattern.gender),
     ageGroup: joi.number().min(0),
 })
 
@@ -24,7 +24,7 @@ const updateProduct = joi.object().keys({
     image: joi.string(),
     discount: joi.number().min(0).max(80),
     size: joi.string().min(24).max(24).required(),
-    gender: joi.string().min(4).max(5).regex(pattern.strPattern),
+    gender: joi.string().min(4).max(5).regex(pattern.gender),
     ageGroup: joi.number().min(0),
 })
 
