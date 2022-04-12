@@ -39,6 +39,9 @@ const orderSchema = mongoose.Schema({
         enum: [1, 2, 3, 4, 5],
         default: 1
     },
+    amount: {
+        type: Number,
+    },
     transectionStatus: {
         type: Boolean,
         default: false
@@ -47,7 +50,8 @@ const orderSchema = mongoose.Schema({
         type: String
     },
     transectionId: {
-        type: String
+        type: String,
+        default: 0
     },
 }, { timestamps: true })
 

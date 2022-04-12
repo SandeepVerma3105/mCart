@@ -8,13 +8,16 @@ const { MerchantBlockedCustomerModel } = require("../models/merchantBlockedCusto
 
 const removeQuery = async(model, data) => {
     console.log("datta", data)
-    await model.deleteOne(data)
-        .then(async(result) => {
-            return result
-        }).catch(async(error) => {
-            console.log(error)
-            return error
-        })
+    try {
+        res = await model.deleteOne(data)
+        return res
+
+    } catch (error) {
+        console.log(error)
+        return errory
+    }
+
+
 }
 
 const aggregateQuery = async(data) => {

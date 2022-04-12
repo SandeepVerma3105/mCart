@@ -200,66 +200,129 @@ const makePayment = async(req, res) => {
         { path: "userAddressId", model: "userAddress", select: ["_id", "houseNo", "state", "pinCode"] },
     ]
     transectionId = await KEY.random_key()
-    await helperService.populateQuery(OrderDetailModel, { userId: req.tokenData.id, _id: data.orderId }, field)
+    data.orderId.forEach(async element => {
+        console.log("hhjhjshsldfhsldfhsld===============>>>>>>>>>", element)
+        await helperService.populateQuery(OrderDetailModel, { userId: req.tokenData.id, _id: element }, field)
 
-    .then(async(result) => {
-        if (result != 0) {
-            totalAmount = (result[0].baseCost * result[0].unit) + ((result[0].baseCost * result[0].unit) * result[0].discount) / 100
-            paymentData = {
-                paymentKey: data.paymentKey,
-                transectionStatus: true,
-                transectionId: transectionId,
-                totalAmount: totalAmount
-            }
-            await helperService.updateQuery(OrderDetailModel, data, paymentData).then(async(resultdata) => {
-                if (result.error) {
-                    result = await successResponse(
-                        true,
-                        null,
-                        httpStatus.OK, {
-                            errCode: errors.INTERNAL_SERVER_ERROR.status,
-                            errMsg: constents.INTERNAL_SERVER_ERROR
-                        },
-                        ""
-                    )
-                    res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-                } else {
-                    result = await successResponse(
-                        true, {
-                            resultdata,
-                        },
-                        httpStatus.OK,
-                        "",
-                        constents.PAYMENT_SUCCESSFULL)
-                    res.status(httpStatus.OK).json(result)
+        .then(async(result) => {
+            if (result != 0) {
+                totalAmount = (result[0].baseCost * result[0].unit) + ((result[0].baseCost * result[0].unit) * result[0].discount) / 100
+                paymentData = {
+                    paymentKey: data.paymentKey,
+                    transectionStatus: true,
+                    transectionId: transectionId,
+                    totalAmount: totalAmount
                 }
-            })
-        } else {
+                await helperService.updateQuery(OrderDetailModel, { _id: element }, paymentData).then(async(resultdata) => {
+                    if (result.error) {
+                        result = await successResponse(
+                            true,
+                            null,
+                            httpStatus.OK, {
+                                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                                errMsg: constents.INTERNAL_SERVER_ERROR
+                            },
+                            ""
+                        )
+                        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+                    } else {
+                        result = await successResponse(
+                            true, {
+                                resultdata,
+                            },
+                            httpStatus.OK,
+                            "",
+                            constents.PAYMENT_SUCCESSFULL)
+                        res.status(httpStatus.OK).json(result)
+                    }
+                })
+            } else {
+                result = await successResponse(
+                    true,
+                    null,
+                    httpStatus.OK, {
+                        errCode: errors.DATA_NOT_FOUND.status,
+                        errMsg: constents.DATA_NOT_FOUND
+                    },
+                    ""
+                )
+                res.status(httpStatus.NOT_FOUND).json(result)
+            }
+
+        }).catch(async err => {
+            console.log(err)
             result = await successResponse(
                 true,
                 null,
                 httpStatus.OK, {
-                    errCode: errors.DATA_NOT_FOUND.status,
-                    errMsg: constents.DATA_NOT_FOUND
+                    errCode: errors.INTERNAL_SERVER_ERROR.status,
+                    errMsg: constents.INTERNAL_SERVER_ERROR
                 },
                 ""
             )
-            res.status(httpStatus.NOT_FOUND).json(result)
-        }
+            res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+        })
+    });
+    // await helperService.populateQuery(OrderDetailModel, { userId: req.tokenData.id, _id: data.orderId }, field)
 
-    }).catch(async err => {
-        console.log(err)
-        result = await successResponse(
-            true,
-            null,
-            httpStatus.OK, {
-                errCode: errors.INTERNAL_SERVER_ERROR.status,
-                errMsg: constents.INTERNAL_SERVER_ERROR
-            },
-            ""
-        )
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-    })
+    // .then(async(result) => {
+    //     if (result != 0) {
+    //         totalAmount = (result[0].baseCost * result[0].unit) + ((result[0].baseCost * result[0].unit) * result[0].discount) / 100
+    //         paymentData = {
+    //             paymentKey: data.paymentKey,
+    //             transectionStatus: true,
+    //             transectionId: transectionId,
+    //             totalAmount: totalAmount
+    //         }
+    //         await helperService.updateQuery(OrderDetailModel, data, paymentData).then(async(resultdata) => {
+    //             if (result.error) {
+    //                 result = await successResponse(
+    //                     true,
+    //                     null,
+    //                     httpStatus.OK, {
+    //                         errCode: errors.INTERNAL_SERVER_ERROR.status,
+    //                         errMsg: constents.INTERNAL_SERVER_ERROR
+    //                     },
+    //                     ""
+    //                 )
+    //                 res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    //             } else {
+    //                 result = await successResponse(
+    //                     true, {
+    //                         resultdata,
+    //                     },
+    //                     httpStatus.OK,
+    //                     "",
+    //                     constents.PAYMENT_SUCCESSFULL)
+    //                 res.status(httpStatus.OK).json(result)
+    //             }
+    //         })
+    //     } else {
+    //         result = await successResponse(
+    //             true,
+    //             null,
+    //             httpStatus.OK, {
+    //                 errCode: errors.DATA_NOT_FOUND.status,
+    //                 errMsg: constents.DATA_NOT_FOUND
+    //             },
+    //             ""
+    //         )
+    //         res.status(httpStatus.NOT_FOUND).json(result)
+    //     }
+
+    // }).catch(async err => {
+    //     console.log(err)
+    //     result = await successResponse(
+    //         true,
+    //         null,
+    //         httpStatus.OK, {
+    //             errCode: errors.INTERNAL_SERVER_ERROR.status,
+    //             errMsg: constents.INTERNAL_SERVER_ERROR
+    //         },
+    //         ""
+    //     )
+    //     res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    // })
 }
 
 

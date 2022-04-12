@@ -5,6 +5,7 @@ const signUp = joi.object().keys({
     lastName: joi.string().min(3).required().regex(pattern.strPattern),
     phoneNumber: joi.string().length(10).regex(pattern.mobileNoPattern).required(),
     email: joi.string().email(),
+    DOB: joi.date().max('1-1-1922').iso(),
     countryCode: joi.string().max(5).min(2).regex(pattern.conturyCodePatter),
     address: joi.object().required().keys({
         houseNo: joi.string().required(),
@@ -27,10 +28,6 @@ const signIn = joi.object().keys({
 })
 
 const placeOrder = joi.object().keys({
-    productId: joi.string().min(24).max(24).required(),
-    unit: joi.number().min(1).required(),
-    discount: joi.number().min(0).max(100),
-    baseCost: joi.number().min(0).max(100),
     addressId: joi.string().min(24).max(24).required(),
 })
 
