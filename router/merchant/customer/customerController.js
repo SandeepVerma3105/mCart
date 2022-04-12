@@ -69,8 +69,7 @@ const blockedCustomerList = async(req, res) => {
 
 const customerDetail = async(req, res) => {
     req.body._id = req.query.userId
-    console.log("ndkjdk=", req.body)
-    getdata = await helperService.populateQuery(UserModel, req.body, [{ path: "address", select: ["-__v", "-createdAt", "-updatedAt"] }])
+    getdata = await helperService.populateQuery(UserModel, req.body, [{ path: "address", select: ["-__v"] }])
     if (getdata.errors) {
         result = await successResponse(
             true,

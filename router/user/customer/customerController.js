@@ -22,6 +22,7 @@ const { successResponse } = require("../../../response/success")
 const { OrderDetailModel } = require("../../../models/orderDetail")
 const { toInteger } = require("lodash")
 const { CustomerMerchantMapping } = require("../../../models/customerMerchantMapping")
+const number = require("joi/lib/types/number")
 
 const signUp = async(req, res, next) => {
     data = req.item
@@ -509,71 +510,7 @@ const removeCart = async(req, res) => {
         userId: req.tokenData.id
     }
     getData = await productServices.removeQuery(CartModel, data)
-    console.log("cdsdffsdf", getData)
-}
-
-const placeOrder = async(req, res) => {
-    data = req.item
-    getData = await helperService.findQuery(ProductModel, { _id: data.productId })
-    console.log(data, getData)
-    if (getData.length > 0 && getData[0].unit >= data.unit) {
-        getdata = await helperService.insertQuery(OrderDetailModel, {
-            userId: req.tokenData.id,
-            productId: data.productId,
-            unit: data.unit,
-            discount: getData[0].discount,
-            baseCost: getData[0].baseCost,
-            userAddressId: data.addressId,
-            merchantId: getData[0].merchantId
-
-        })
-        if (getdata.errors) {
-            result = await successResponse(
-                true,
-                null,
-                httpStatus.OK, {
-                    errCode: errors.INTERNAL_SERVER_ERROR.status,
-                    errMsg: constents.INTERNAL_SERVER_ERROR
-                },
-                ""
-            )
-            res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-            return
-        }
-        if (getdata.length > 0)
-            unit = getData[0].unit - data.unit
-        updateQuantity = await helperService.updateQuery(ProductModel, { _id: data.productId }, { unit: unit })
-            .then(async() => {
-                deleteData = await CartModel.deleteOne({ _id: data.productId, userId: req.tokenData.id })
-            })
-            .then(async() => {
-                result = await successResponse(
-                    true, {
-                        getdata,
-
-                    },
-                    httpStatus.OK,
-                    "",
-                    constents.ORDER_PLACED)
-                res.status(httpStatus.OK).json(result)
-            })
-
-    }
-    if (getData.length > 0 && getData[0].unit < data.unit) {
-        result = await successResponse(
-            true, {
-                productQuantity: getData[0].unit,
-                orderQuantity: data.unit
-            },
-            httpStatus.OK, {
-                errCode: errors.BAD_REQUEST.status,
-                errMsg: constents.QUANTITY
-            },
-            ""
-        )
-        res.status(httpStatus.OK).json(result)
-    }
-    if (getData == 0) {
+    if (getData.deletedCount == 0) {
         result = await successResponse(
             true,
             null,
@@ -585,7 +522,16 @@ const placeOrder = async(req, res) => {
         )
         res.status(httpStatus.NOT_FOUND).json(result)
     }
-    if (getData.errors) {
+    if (getData.deletedCount == 1) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, "",
+            constents.REMOVE_CART
+        )
+        res.status(httpStatus.NOT_FOUND).json(result)
+    }
+    if (getData.error) {
         result = await successResponse(
             true,
             null,
@@ -596,33 +542,141 @@ const placeOrder = async(req, res) => {
             ""
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-
     }
+}
+
+const placeOrder = async(req, res) => {
+    data = req.item
+    getCartData = await helperService.findQuery(CartModel, { userId: req.tokenData.id })
+    if (getCartData.length > 0) {
+        grandTotal = 0
+        await getCartData.forEach(async element => {
+            getData = await helperService.findQuery(ProductModel, { _id: element.productId })
+            if (getData.length > 0 && getData[0].unit >= element.unit) {
+                orderIds = []
+                amount = Number(element.unit * element.baseCost) - (Number(element.unit * element.baseCost) * Number(getData[0].discount / 100))
+                grandTotal += Number(element.unit * element.baseCost) - (Number(element.unit * element.baseCost) * Number(getData[0].discount / 100))
+                getdata = await helperService.insertQuery(OrderDetailModel, {
+                    userId: req.tokenData.id,
+                    productId: element.productId,
+                    unit: element.unit,
+                    discount: getData[0].discount,
+                    baseCost: getData[0].baseCost,
+                    userAddressId: data.addressId,
+                    merchantId: getData[0].merchantId,
+                    amount: amount,
+                })
+                orderIds.push(getdata[0]._id)
+                if (getdata.errors) {
+                    result = await successResponse(
+                        true,
+                        null,
+                        httpStatus.OK, {
+                            errCode: errors.INTERNAL_SERVER_ERROR.status,
+                            errMsg: constents.INTERNAL_SERVER_ERROR
+                        },
+                        ""
+                    )
+                    res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+                }
+                if (getdata.length > 0 && !getdata.errors)
+                    unit = getData[0].unit - element.unit
+                updateQuantity = await helperService.updateQuery(ProductModel, { _id: element.productId }, { unit: unit })
+                    .then(async() => {
+                        deleteData = await CartModel.deleteOne({ productId: element.productId, userId: req.tokenData.id })
+                    })
+                    .then(async() => {
+                        result = await successResponse(
+                            true, {
+                                orderIds,
+                                grandTotal
+                            },
+                            httpStatus.OK,
+                            "",
+                            constents.ORDER_PLACED)
+                        res.status(httpStatus.OK).json(result)
+                    })
+            }
+            if (getData.length > 0 && getData[0].unit < element.unit && !getData.errors) {
+                result = await successResponse(
+                    true, {
+                        productId: element.productId,
+                        productQuantity: getData[0].unit,
+                        orderQuantity: element.unit
+                    },
+                    httpStatus.OK, {
+                        errCode: errors.BAD_REQUEST.status,
+                        errMsg: constents.QUANTITY
+                    },
+                    ""
+                )
+                res.status(httpStatus.OK).json(result)
+            }
+            if (getData == 0) {
+                result = await successResponse(
+                    true,
+                    null,
+                    httpStatus.OK, {
+                        errCode: errors.DATA_NOT_FOUND.status,
+                        errMsg: constents.DATA_NOT_FOUND
+                    },
+                    ""
+                )
+                res.status(httpStatus.NOT_FOUND).json(result)
+            }
+            if (getData.errors) {
+                result = await successResponse(
+                    true,
+                    null,
+                    httpStatus.OK, {
+                        errCode: errors.INTERNAL_SERVER_ERROR.status,
+                        errMsg: constents.INTERNAL_SERVER_ERROR
+                    },
+                    ""
+                )
+                res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+            }
+
+        });
+    } else {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.DATA_NOT_FOUND.status,
+                errMsg: constents.DATA_NOT_FOUND
+            },
+            ""
+        )
+        res.status(httpStatus.NOT_FOUND).json(result)
+    }
+
 }
 
 const checkCart = async(req, res) => {
     getdata = await helperService.findQuery(CartModel, { userId: req.tokenData.id })
+    console.log(getdata)
     if (getdata.length > 0) {
         result = await successResponse(
             true, getdata,
             httpStatus.OK,
             "",
-            constents.CART_LIST
+            constents.CHECK_CART
         )
         res.status(httpStatus.OK).json(result)
 
     }
-    if (getdata.length == 0) {
+    if (getdata == 0) {
         result = await successResponse(
             true, { data: [], count: 0 },
             httpStatus.OK,
             "",
-            constents.CART_LIST
+            constents.CHECK_CART
         )
         res.status(httpStatus.OK).json(result)
 
     }
-    if (getdata.error) {
+    if (getdata.errors) {
         result = await successResponse(
             true,
             null,
@@ -638,12 +692,11 @@ const checkCart = async(req, res) => {
 
 const trackOrder = async(req, res) => {
     data = req.item
-    data.orderStatus != 5
     field = [
         { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
         { path: "productId", model: "product", select: ["name"] },
         { path: "userAddressId", model: "userAddress" },
-        { path: "merchantId", model: "merchant" }
+        { path: "merchantId", model: "merchant", select: ["firstName", "lastName", "email"] }
     ]
     getdata = await helperService.populateQuery(OrderDetailModel, { userId: req.tokenData.id }, field)
     if (getdata.error) {

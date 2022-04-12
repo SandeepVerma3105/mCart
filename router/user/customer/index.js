@@ -16,8 +16,8 @@ route.post("/addCart", verifyToken.verifyToken, verifyToken.parseJwtCustomer, re
 route.delete("/removeCart", verifyToken.verifyToken, verifyToken.parseJwtCustomer, requestValidator(customerSchema.productId, "query"), customerController.removeCart)
 route.get("/checkCart", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.checkCart)
 route.post("/placeOrder", verifyToken.verifyToken, verifyToken.parseJwtCustomer, requestValidator(customerSchema.placeOrder), customerController.placeOrder)
-route.get("/trackOrder", verifyToken.verifyToken, verifyToken.parseJwtCustomer, requestValidator(customerSchema.customerId, "query"), customerController.trackOrder)
-route.get("/orderHistory", verifyToken.verifyToken, verifyToken.parseJwtCustomer, requestValidator(customerSchema.customerId, "query"), customerController.orderHistory)
+route.get("/trackOrder", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.trackOrder)
+route.get("/orderHistory", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.orderHistory)
 route.put("/updateUnit", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.updateUnit)
 
 module.exports = route
