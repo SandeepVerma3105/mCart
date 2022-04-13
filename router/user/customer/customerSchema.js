@@ -8,13 +8,13 @@ const signUp = joi.object().keys({
     DOB: joi.date().max('1-1-1922').iso(),
     countryCode: joi.string().max(5).min(2).regex(pattern.conturyCodePatter),
     address: joi.object().required().keys({
-        houseNo: joi.string().required(),
+        houseNo: joi.string().required().regex(pattern.houseNo),
         colony: joi.string().regex(pattern.strPattern),
         landMark: joi.string().regex(pattern.strPattern),
-        pinCode: joi.number().required(),
+        pinCode: joi.string().required().regex(pattern.num).min(6).max(6),
         city: joi.string().required().regex(pattern.strPattern),
         state: joi.string().required().regex(pattern.state),
-        country: joi.string().regex(pattern.strPattern),
+        country: joi.string().regex(pattern.capital),
     }),
 })
 
@@ -47,22 +47,22 @@ const updateUnit = joi.object().keys({
 })
 
 const addAddress = joi.object().keys({
-    houseNo: joi.string().required().regex(pattern.strPattern),
+    houseNo: joi.string().required().regex(pattern.houseNo),
     colony: joi.string().regex(pattern.strPattern),
     landMark: joi.string().regex(pattern.strPattern),
     pinCode: joi.string().required().max(6).min(6).regex(pattern.num),
-    city: joi.string().regex(pattern.strPattern),
-    state: joi.string().required().regex(pattern.strPattern),
-    country: joi.string().required().regex(pattern.strPattern),
+    city: joi.string().regex(pattern.capital),
+    state: joi.string().required().regex(pattern.state),
+    country: joi.string().required().regex(pattern.capital),
 })
 const updateAddress = joi.object().keys({
-    houseNo: joi.string().regex(pattern.strPattern),
+    houseNo: joi.string().regex(pattern.houseNo),
     colony: joi.string().regex(pattern.strPattern),
     landMark: joi.string().regex(pattern.strPattern),
     pinCode: joi.string().max(6).min(6).regex(pattern.num),
-    city: joi.string().regex(pattern.strPattern),
-    state: joi.string().regex(pattern.strPattern),
-    country: joi.string().regex(pattern.strPattern),
+    city: joi.string().regex(pattern.capital),
+    state: joi.string().regex(pattern.state),
+    country: joi.string().regex(pattern.capital),
 })
 
 const addressId = joi.object().keys({
