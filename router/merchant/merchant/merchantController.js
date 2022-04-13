@@ -8,7 +8,7 @@ const { MerchantAddressModel } = require("../../../models/merchantAddress")
 
 const constents = require("../../../constents/constent")
 const errors = require("../../../error/error")
-const { jwtToken, parseJwt } = require("../../../utils/jwtToket")
+const { jwtToken, parseJwt, jwtrefreshToken } = require("../../../utils/jwtToket")
 const KEY = require("../../../utils/randamKey")
 const helperService = require("../../../services/helper")
 const { successResponse } = require("../../../response/success")
@@ -119,12 +119,14 @@ const Login = async(req, res) => {
         res.status(httpStatus.UNAUTHORIZED).json(result)
     } else {
         let token = jwtToken(getdata[0].email, "merchant", getdata[0]._id)
+        let refreshToken = jwtrefreshToken(getdata[0].email, "merchant", getdata[0]._id)
         result = await successResponse(
             true, {
                 _id: getdata[0]._id,
                 fullName: getdata[0].firstName + " " + getdata[0].lastName,
                 email: getdata[0].email,
-                token: token
+                token: token,
+                refreshToken: refreshToken
             },
             httpStatus.OK,
             "",

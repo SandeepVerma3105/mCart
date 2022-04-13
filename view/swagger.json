@@ -1,0 +1,62 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "0.0.1",
+        "title": "mCart"
+    },
+    "basePath": "/",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json",
+        "application/x-www-form-urlencoded",
+        "multipart/form-data"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "tags": [{
+            "name": "user",
+            "description": "Mobile Apis"
+        },
+        {
+            "name": "admin",
+            "description": "Web Apis"
+        },
+        {
+            "name": "callback-urls",
+            "description": "urls APIs"
+        }
+    ],
+    "paths": {
+
+
+        "/swagger": {
+            "x-swagger-pipe": "swagger_raw"
+        }
+    },
+    "definitions": {
+        "HelloWorldResponse": {
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "ErrorResponse": {
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

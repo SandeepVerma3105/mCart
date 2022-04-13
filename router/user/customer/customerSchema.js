@@ -1,8 +1,8 @@
 const joi = require("joi")
 const pattern = require("../../../utils/regex")
 const signUp = joi.object().keys({
-    firstName: joi.string().min(3).required().regex(pattern.strPattern),
-    lastName: joi.string().min(3).required().regex(pattern.strPattern),
+    firstName: joi.string().min(3).max(20).required().regex(pattern.name),
+    lastName: joi.string().min(3).max(20).required().regex(pattern.name),
     phoneNumber: joi.string().length(10).regex(pattern.mobileNoPattern).required(),
     email: joi.string().email(),
     DOB: joi.date().max('1-1-1922').iso(),
