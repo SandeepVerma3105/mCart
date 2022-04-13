@@ -156,7 +156,7 @@ const updatepayment = async(req, res, next) => {
 
 const deletepayment = async(req, res, next) => {
     data = req.params.id
-    data.userId = req.tokenData.id
+        // data.userId = req.tokenData.id
     getdata = await PaymentModel.deleteOne({ _id: ObjectID(data) })
     if (getdata.error) {
         result = await successResponse(

@@ -10,5 +10,6 @@ module.exports = pattern = {
     size: /^[SMLX]{1}|{XL}|{XXL}$/,
     state: /^[A-Z]+[A-Za-z ]*[0-9]*$/,
     gender: /^(m|M|male|Male|f|F|female|Female)?$/,
-    name: /^[A-Z]+[a-z]{2,30}$/
+    name: /^[A-Z]+[a-z]{2,30}$/,
+    houseNo: /^[A-Za-z0-9 ]*[/]?[A-Za-z0-9 ]*$/
 }
