@@ -5,7 +5,8 @@ const constent = require('../constents/constent');
 const secretKey = process.env.SECRET_KEY
 const errors = require('../error/error')
 const jwtDecode = require("jwt-decode")
-const { successResponse } = require("../response/success")
+const { successResponse } = require("../response/success");
+const { jwtToken } = require('../utils/jwtToket');
 
 //verify token 
 function verifyToken(req, res, next) {
@@ -40,6 +41,42 @@ function verifyToken(req, res, next) {
         }
     });
 }
+
+function verifyRefreshToken(req, res, next) {
+    let token = req.headers['accesstoken'];
+    console.log("TCL: verifyToken -> token", token)
+    if (!token) return res.status(httpStatus.UNAUTHORIZED).send({
+        success: false,
+        error: httpStatus.UNAUTHORIZED + " UNAUTHORIZED",
+        message: "no token provided"
+    });
+    jwt.verify(token, secretKey, async function(error, decoded) {
+        if (error) {
+            console.log('------------>Token ERROR', error);
+            result = await successResponse(
+                true,
+                null,
+                httpStatus.OK, {
+                    errCode: errors.UNAUTHORIZED.status,
+                    errMsg: constent.TOKEN_EXPIRE
+                },
+                ""
+            )
+            res.status(httpStatus.UNAUTHORIZED).json(result)
+        } else {
+            console.log('------------------>>token verified', decoded)
+            let token = jwtToken(decoded.phoneNumber, "customer", decoded.id)
+            result = await successResponse(
+                true,
+                token,
+                httpStatus.OK, "",
+                constent.NEW_ACCESS_TOKEN
+            )
+            res.status(httpStatus.UNAUTHORIZED).json(result)
+        }
+    });
+}
+
 
 //valiation for merchant to access apis
 async function parseJwtMerchent(req, res, next) {
@@ -107,5 +144,6 @@ module.exports = {
     verifyToken,
     parseJwtMerchent,
     parseJwtAdmin,
-    parseJwtCustomer
+    parseJwtCustomer,
+    verifyRefreshToken
 }

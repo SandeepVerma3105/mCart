@@ -16,7 +16,19 @@ const jwtToken = (email, role, id) => {
     return token
 }
 
+const jwtrefreshToken = (email, role, id) => {
+    const token = jwt.sign({
+            user: email,
+            role: role,
+            id: id
+        },
+        process.env.SECRET_KEY || SECRET_KEY, {
+            expiresIn: "6d"
+        })
+    return token
+}
 
 module.exports = {
     jwtToken,
+    jwtrefreshToken
 }

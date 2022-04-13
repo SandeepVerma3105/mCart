@@ -12,7 +12,7 @@ const { CartModel } = require("../../../models/cart")
 
 const constents = require("../../../constents/constent")
 const errors = require("../../../error/error")
-const { jwtToken, parseJwt } = require("../../../utils/jwtToket")
+const { jwtToken, jwtrefreshToken } = require("../../../utils/jwtToket")
 const KEY = require("../../../utils/randamKey")
 const helperService = require("../../../services/helper")
 const customerMerchantMapping = require("../../../services/customerMerchantMapping")
@@ -157,12 +157,14 @@ const signIn = async(req, res) => {
             res.status(httpStatus.UNAUTHORIZED).json(result)
         } else {
             let token = jwtToken(getdata[0].phoneNumber, "customer", getdata[0]._id)
+            let refreshToken = jwtrefreshToken(getdata[0].phoneNumber, "customer", getdata[0]._id)
             await OtpModel.remove({ phoneNumber: getdata[0].phoneNumber })
             result = await successResponse(
                 true, {
                     _id: getdata[0]._id,
                     phoneNumber: getdata[0].phoneNumber,
-                    token: token
+                    token: token,
+                    refreshToken: refreshToken
                 },
                 httpStatus.OK,
                 "",
