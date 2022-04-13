@@ -14,7 +14,7 @@ const { MerchantModel } = require("../../models/merchant")
 
 const constents = require("../../constents/constent")
 const errors = require("../../error/error")
-const { jwtToken, parseJwt } = require("../../utils/jwtToket")
+const { jwtToken, parseJwt, jwtrefreshToken } = require("../../utils/jwtToket")
 const KEY = require("../../utils/randamKey")
 const helperService = require("../../services/helper")
 const otp = require("../../utils/otp")
@@ -53,12 +53,14 @@ const Login = async(req, res) => {
     } else {
         console.log(getdata)
         let token = jwtToken(getdata[0].email, getdata[0].role)
+        let refreshToken = jwtrefreshToken(getdata[0].email, getdata[0].role)
         result = await successResponse(
             true, {
                 _id: getdata[0]._id,
                 fullName: getdata.name,
                 email: getdata[0].email,
-                token: token
+                token: token,
+                refreshToken: refreshToken,
             },
             httpStatus.OK,
             "",

@@ -9,5 +9,6 @@ module.exports = pattern = {
     productPattern: /^[A-Z]+([a-z ]+)?([0-9]+)? ?$/,
     size: /^[SMLX]{1}|{XL}|{XXL}$/,
     state: /^[A-Z]+[A-Za-z ]*[0-9]*$/,
-    gender: /^(m|M|male|Male|f|F|female|Female)?$/
+    gender: /^(m|M|male|Male|f|F|female|Female)?$/,
+    name: /^[A-Z]+[a-z]{2,30}$/
 }

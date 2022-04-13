@@ -26,7 +26,7 @@ const req = require("express/lib/request")
 
 const paymentDetail = async(req, res, next) => {
     data = req.item
-    getUserData = await helperService.findQuery(UserModel, { _id: ObjectID(data.userId) })
+    getUserData = await helperService.findQuery(UserModel, { _id: ObjectID(data.req.tokenData.id) })
     if (getUserData.length > 0) {
         getCardData = await helperService.findQuery(PaymentModel, { cardNo: data.cardNo })
         if (getCardData.length > 0) {

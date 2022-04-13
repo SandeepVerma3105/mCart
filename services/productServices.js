@@ -41,12 +41,13 @@ const aggregateQuery = async(data) => {
                                 ]
                             }
                         }
-                    }],
+                    }, ],
                     as: "product",
                 }
             },
             { $unwind: "$product" },
-            { $project: { product: 1, _id: 0 } }
+            { $project: { product: 1, _id: 0 } },
+
         ])
         return res
     } catch (error) {
