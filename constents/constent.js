@@ -18,6 +18,7 @@ module.exports = message = {
     INTERNAL_SERVER_ERROR: "Internal server error",
     LOG_IN: " you have logged in successfully",
     TOKEN_EXPIRE: "token has been expired",
+    NEW_ACCESS_TOKEN: "new access token",
     SESSION_EXPIRE: "SESSION_EXPIRED",
 
     MERCHENT_NOT_EXIST: " merchant not exist",
