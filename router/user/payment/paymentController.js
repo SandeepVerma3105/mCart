@@ -89,7 +89,12 @@ const paymentDetail = async(req, res, next) => {
 
 const paymentList = async(req, res, next) => {
     data = req.query
-    getdata = await helperService.findQuery(PaymentModel, { userId: req.tokenData.id })
+    if (req.query.id) {
+        data._id = req.query.id
+    }
+    data.userId = req.tokenData.id
+    console.log(data)
+    getdata = await helperService.findQuery(PaymentModel, data)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -103,9 +108,8 @@ const paymentList = async(req, res, next) => {
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
     } else {
         result = await successResponse(
-            true, {
-                getdata,
-            },
+            true, { getdata, count },
+
             httpStatus.OK,
             "",
             constents.CARD_LIST)
@@ -155,9 +159,10 @@ const updatepayment = async(req, res, next) => {
 }
 
 const deletepayment = async(req, res, next) => {
-    data = req.params.id
-    data.userId = req.tokenData.id
-    getdata = await PaymentModel.deleteOne({ _id: ObjectID(data) })
+    data = req.query.cardId
+    console.log(data)
+        // data.userId = req.tokenData.id
+    getdata = await PaymentModel.deleteOne({ _id: data })
     if (getdata.error) {
         result = await successResponse(
             true,
