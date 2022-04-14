@@ -20,7 +20,8 @@ const userSchema = mongoose.Schema({
         type: String,
     },
     countryCode: {
-        type: Number,
+        type: String,
+        default: "+91"
 
     },
     address: [{ type: Schema.Types.ObjectId, ref: "userAddress" }],

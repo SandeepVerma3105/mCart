@@ -12,7 +12,7 @@ module.exports = pattern = {
     state: /^[A-Z]+[A-Za-z ]*[0-9]*$/,
     gender: /^(m|M|male|Male|f|F|female|Female)?$/,
     name: /^[A-Z]+[a-z]{2,30}$/,
-    capital: /^[A-Za-z]{2,20}$/,
+    capital: /^[A-Za-z ]{2,30}$/,
     houseNo: /^[A-Za-z0-9 ]*[/]?[A-Za-z0-9 ]*$/,
     alphaNum: /^[A-Za-z0-9]+$/
 }

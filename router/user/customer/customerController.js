@@ -419,6 +419,7 @@ const addCart = async(req, res) => {
     data = req.item
         // data.userId = req.query.userId
     getData = await helperService.findQuery(ProductModel, { _id: data.productId })
+    console.log(getData)
     if (getData == 0) {
         result = await successResponse(
             true, "",
@@ -428,9 +429,9 @@ const addCart = async(req, res) => {
             },
             ""
         )
-        res.status(httpStatus.OK).json(result)
+        res.status(httpStatus.NOT_FOUND).json(result)
     }
-    if (getData[0].unit >= data.unit) {
+    if (getData[0].unit >= data.unit && getData != 0) {
         getdata = await helperService.insertQuery(CartModel, {
             userId: req.tokenData.id,
             productId: data.productId,
@@ -441,7 +442,6 @@ const addCart = async(req, res) => {
         getdata = await customerMerchantMapping.updateQuery(CustomerMerchantMapping, { merchant: getData[0].merchantId }, {
             $push: { customer: { _id: req.tokenData.id } }
         })
-        console.log(getdata)
         if (getdata.reason) {
             result = await successResponse(
                 true,
@@ -477,7 +477,7 @@ const addCart = async(req, res) => {
 
 
     }
-    if (getData[0].unit < data.unit) {
+    if (getData[0].unit < data.unit && getData != 0) {
         result = await successResponse(
             true, {
                 productQuantity: getData[0].unit,
