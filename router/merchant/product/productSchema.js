@@ -16,14 +16,14 @@ const addProduct = joi.object().keys({
 })
 
 const updateProduct = joi.object().keys({
-    name: joi.string().min(3).regex(pattern.productPattern),
+    name: joi.string().min(3).regex(pattern.strPattern),
     sortDescription: joi.string().min(50).max(150),
     logDescription: joi.string().min(150).max(500),
-    unit: joi.number().integer().min(0),
+    unit: joi.number().integer().min(1),
     baseCost: joi.number().min(0),
     image: joi.string(),
     discount: joi.number().min(0).max(80),
-    size: joi.string().min(24).max(24).required(),
+    size: joi.string().min(24).max(24),
     gender: joi.string().min(4).max(5).regex(pattern.gender),
     ageGroup: joi.number().min(0),
 })
