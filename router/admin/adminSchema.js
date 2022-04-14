@@ -8,12 +8,12 @@ const credeintial = joi.object().keys({
 
 const category = joi.object().keys({
     name: joi.string().required().regex(pattern.strPattern),
-    description: joi.string().required().regex(pattern.strPattern)
+    description: joi.string().required().max(150).min(50)
 })
 const brand = joi.object().keys({
     categoryId: joi.string().min(24).max(24).required(),
-    name: joi.string().required().regex(pattern.strPattern),
-    description: joi.string().required().regex(pattern.strPattern)
+    name: joi.string().required().max(30).regex(pattern.strPattern),
+    description: joi.string().required().max(150).min(50)
 })
 
 const email = joi.object().keys({
@@ -33,7 +33,7 @@ const block = joi.object().keys({
 
 const size = joi.object().keys({
     categoryId: joi.string().min(24).max(24).required(),
-    size: joi.string().required(),
+    size: joi.string().required().regex(pattern.capital),
 })
 
 module.exports = {
