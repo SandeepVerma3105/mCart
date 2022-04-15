@@ -6,7 +6,7 @@ const verifyToken = require("../../../middleware/auth")
 const customerSchema = require("./customerSchema")
 
 route.get("/customers", verifyToken.verifyToken, verifyToken.parseJwtMerchent, customerController.customers)
-route.get("/customerById", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(customerSchema.userId, "query"), customerController.customerDetail)
+route.get("/customerById", verifyToken.verifyToken, verifyToken.parseJwtMerchent, customerController.customerDetail)
 route.put("/blockCustomer", verifyToken.verifyToken, verifyToken.parseJwtMerchent, requestValidator(customerSchema.customerId), customerController.blockCustomer)
 route.get("/blockedCustomerList", verifyToken.verifyToken, verifyToken.parseJwtMerchent, customerController.blockedCustomerList)
 module.exports = route
