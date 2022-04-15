@@ -168,7 +168,8 @@ const getProduct = async(req, res) => {
     let field = [
         { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "email"] },
         { path: "categoryId", model: "category", select: ["_id", "name", "lastName"] },
-        { path: "brandId", model: "brand", select: ["_id", "name", "lastName"] }
+        { path: "brandId", model: "brand", select: ["_id", "name", "lastName"] },
+        { path: "size", model: "size", select: ["_id", "size", "categoryId"] }
     ]
     if (!req.query) {
         req.query = req.query

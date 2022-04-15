@@ -5,7 +5,7 @@ const addProduct = joi.object().keys({
     brandId: joi.string().required().min(24).max(24),
     name: joi.string().min(2).required().regex(pattern.strPattern),
     sortDescription: joi.string().required().min(50).max(150),
-    logDescription: joi.string().min(150).max(500),
+    longDescription: joi.string().min(150).max(500),
     unit: joi.number().integer().required().min(1).max(9999999999),
     image: joi.string(),
     baseCost: joi.number().required().min(0).max(9999999999),
@@ -18,7 +18,7 @@ const addProduct = joi.object().keys({
 const updateProduct = joi.object().keys({
     name: joi.string().min(3).regex(pattern.strPattern),
     sortDescription: joi.string().min(50).max(150),
-    logDescription: joi.string().min(150).max(500),
+    longDescription: joi.string().min(150).max(500),
     unit: joi.number().integer().min(1).max(9999999999),
     baseCost: joi.number().min(0).max(9999999999),
     image: joi.string(),
