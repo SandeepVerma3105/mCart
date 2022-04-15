@@ -16,9 +16,20 @@ const { CustomerMerchantMapping } = require("../../../models/customerMerchantMap
 
 
 const customers = async(req, res) => {
+    data = {}
+    data.merchant = req.tokenData.id
+        // if (req.query.id) {
+        //     data._id = req.query.id
+        // }
+        // if (req.query.name) {
+        //     $or = [{ "customer._id.firstName": { $regex: '.*' + req.query.name + '.*', "$options": 'i' } },
+        //         { "customer._id.lastName": { $regex: '.*' + req.query.name + '.*', "$options": 'i' } }
+        //     ]
+        // }
+        // console.log(data)
 
     field = [{ path: "customer._id", model: "user", select: ["-__v"] }]
-    getdata = await helperService.populateQuery(CustomerMerchantMapping, { merchant: req.tokenData.id }, field)
+    getdata = await helperService.populateQuery(CustomerMerchantMapping, data, field)
     if (getdata.error) {
         result = await successResponse(
             true,
@@ -41,6 +52,7 @@ const customers = async(req, res) => {
     }
 }
 const blockedCustomerList = async(req, res) => {
+
 
     field = [{ path: "customer._id", model: "user", select: ["-__v"] }]
     getdata = await helperService.populateQuery(MerchantBlockedCustomerModel, { merchant: req.tokenData.id }, field)
@@ -68,8 +80,21 @@ const blockedCustomerList = async(req, res) => {
 
 
 const customerDetail = async(req, res) => {
-    req.body._id = req.query.userId
-    getdata = await helperService.populateQuery(UserModel, req.body, [{ path: "address", select: ["-__v"] }])
+    req.query.merchantId = req.tokenData.id
+
+    if (req.query.userId) {
+        req.query._id = req.query.userId
+    }
+
+    if (req.query.name) {
+        req.query.$or = [{ firstName: { $regex: '.*' + req.query.name + '.*', "$options": 'i' } },
+            { lastName: { $regex: '.*' + req.query.name + '.*', "$options": 'i' } }
+        ]
+    }
+
+
+
+    getdata = await helperService.populateQuery(UserModel, req.query, [{ path: "address", select: ["-__v"] }])
     if (getdata.errors) {
         result = await successResponse(
             true,
