@@ -28,9 +28,17 @@ const customers = async(req, res) => {
         // }
         // console.log(data)
 
+
+    regex = new RegExp(req.query.name, 'i')
     field = [{ path: "customer._id", model: "user", select: ["-__v"] }]
+    if (req.query.name) {
+
+        field = [{ path: "customer._id", model: "user", select: ["-__v"], match: { $or: [{ firstName: regex }, { lastName: regex }] } }]
+    }
     getdata = await helperService.populateQuery(CustomerMerchantMapping, data, field)
+
     if (getdata.error) {
+
         result = await successResponse(
             true,
             null,
@@ -42,8 +50,16 @@ const customers = async(req, res) => {
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
     } else {
+        console.log(getdata[0].customer)
+        arr = []
+        getdata[0].customer.forEach(element => {
+            if (element._id != null) {
+                arr.push(element)
+            }
+
+        });
         result = await successResponse(
-            true, { data: getdata, count: getdata.count },
+            true, { data: arr, count: arr.length },
             httpStatus.OK,
             "",
             constents.customer_LIST

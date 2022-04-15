@@ -25,7 +25,7 @@ const orders = async(req, res) => {
         // }
     field = [
             { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
-            { path: "productId", model: "product", select: ["name", "sortDescription"], match: { $or: [{ name: regex }, { sortDescription: regex }] } },
+            { path: "productId", model: "product", select: ["name"], match: { name: regex } },
             { path: "userAddressId", model: "userAddress" },
             { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "phoneNumber", "email"] }
         ]
@@ -66,7 +66,6 @@ const orders = async(req, res) => {
             }
 
         });
-        console.log(arr)
         result = await successResponse(
             true, { data: arr, count: arr.length },
             httpStatus.OK,
