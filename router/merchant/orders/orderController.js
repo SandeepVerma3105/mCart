@@ -16,6 +16,12 @@ const orders = async(req, res) => {
     field = [{ path: "productId", model: "product", select: ["_id", "name"] },
         // {  path: "userId",  model: "user",select: ["firstName", "lastName",]},
     ]
+    if (req.query.productName) {
+        regex = new RegExp(req.query.productName, 'i')
+        field = [
+            { path: "productId", model: "product", select: ["name"], match: { name: regex } },
+        ]
+    }
     if (req.query._id) {
         field = [
             { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
@@ -62,6 +68,9 @@ const changeOrederStatus = async(req, res) => {
     if (data.status == 1) {
         msg = constents.ORDER_PENDING
     }
+    if (data.status == 2) {
+        msg = constents.ORDER_ACCEPTED
+    }
     if (data.status == 3) {
         msg = constents.ORDER_CANCEL
     }
@@ -71,7 +80,7 @@ const changeOrederStatus = async(req, res) => {
     if (data.status == 5) {
         msg = constents.ORDER_DELEVERED
     }
-    if (data.status != 1 && data.status != 3 && data.status != 4 && data.status != 5) {
+    if (data.status != 1 && data.status != 2 && data.status != 3 && data.status != 4 && data.status != 5) {
         result = await successResponse(
             true,
             null,
@@ -198,11 +207,13 @@ const acceptOrder = async(req, res) => {
             },
             ""
         )
-        res.status(httpStatus.OK).json(result)
+        res.status(httpStatus.BAD_REQUEST).json(result)
     }
 }
 
 const ordersDetail = async(req, res) => {
+
+
     field = [
         { path: "productId", model: "product", select: ["name"] },
     ]
