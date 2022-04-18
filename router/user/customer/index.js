@@ -19,5 +19,7 @@ route.post("/placeOrder", verifyToken.verifyToken, verifyToken.parseJwtCustomer,
 route.get("/trackOrder", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.trackOrder)
 route.get("/orderHistory", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.orderHistory)
 route.put("/updateUnit", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.updateUnit)
+route.get("/category", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.category)
+route.get("/brands", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.brands)
 
 module.exports = route
