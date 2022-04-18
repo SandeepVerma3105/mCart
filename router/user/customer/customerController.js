@@ -23,6 +23,8 @@ const { OrderDetailModel } = require("../../../models/orderDetail")
 const { toInteger } = require("lodash")
 const { CustomerMerchantMapping } = require("../../../models/customerMerchantMapping")
 const number = require("joi/lib/types/number")
+const { CategoryModel } = require("../../../models/category")
+const { BrandModel } = require("../../../models/brand")
 
 const signUp = async(req, res, next) => {
     data = req.item
@@ -176,6 +178,7 @@ const signIn = async(req, res) => {
 const getnerateOTP = async(req, res) => {
     data = req.item
     getdata = await helperService.findQuery(UserModel, { phoneNumber: data.phoneNumber })
+    console.log(getdata)
     if (getdata.length > 0) {
         getOtp = await otp.getnerateOTP({ phoneNumber: data.phoneNumber })
         if (getOtp == 1) {
@@ -225,7 +228,7 @@ const getnerateOTP = async(req, res) => {
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
     }
-    if (getdata.length == 0) {
+    if (getdata == 0) {
         result = await successResponse(
             true,
             null,
@@ -356,13 +359,67 @@ const addressList = async(req, res) => {
     }
 }
 
+const category = async(req, res) => {
+    getdata = await helperService.findQuery(CategoryModel, req.query)
+    console.log(getdata)
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    } else {
+        result = await successResponse(
+            true, { data: getdata, count: getdata.count },
+            httpStatus.OK,
+            "",
+            constents.CATEGORY_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+}
+
+const brands = async(req, res) => {
+    field = [
+        { path: "categoryId", model: "category", select: ["_id", "name"] },
+    ]
+    getdata = await helperService.populateQuery(BrandModel, req.query, field)
+    if (getdata.error) {
+        result = await successResponse(
+            true,
+            null,
+            httpStatus.OK, {
+                errCode: errors.INTERNAL_SERVER_ERROR.status,
+                errMsg: constents.INTERNAL_SERVER_ERROR
+            },
+            ""
+        )
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+    } else {
+        result = await successResponse(
+            true, { data: getdata, count: getdata.count },
+            httpStatus.OK,
+            "",
+            constents.CATEGORY_LIST
+        )
+        res.status(httpStatus.OK).json(result)
+    }
+}
+
+
 const getProduct = async(req, res) => {
     req.query.isDelete = false
     req.query.status = false
+    req.query._id = req.tokenData.id
     console.log(req.query)
 
-    getdata = await productServices.aggregateQuery({ _id: req.tokenData.id })
-    console.log("getdata++++++==.>>>", getdata)
+    getdata = await productServices.aggregateQuery(req.query)
+        // console.log("getdata++++++==.>>>", getdata)
         // let field = [
         //     { path: "categoryId", model: "category", select: ["name"] },
         //     { path: "brandId", model: "brand", select: ["_id", "name"] },
@@ -808,6 +865,8 @@ module.exports = {
     addressList,
     getnerateOTP,
     getProduct,
+    category,
+    brands,
     addCart,
     removeCart,
     checkCart,
