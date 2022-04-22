@@ -13,6 +13,7 @@ const { successResponse } = require("../../../response/success")
 const { SizeModel } = require("../../../models/size")
 const { SIZE_LIST } = require("../../../constents/constent")
 
+//get category List
 const category = async(req, res) => {
     getdata = await helperService.findQuery(CategoryModel, req.query)
     console.log(getdata)
@@ -38,7 +39,7 @@ const category = async(req, res) => {
     }
 }
 
-
+//get brands list
 const brands = async(req, res) => {
     field = [
         { path: "categoryId", model: "category", select: ["_id", "name"] },
@@ -66,6 +67,7 @@ const brands = async(req, res) => {
     }
 }
 
+//get size list
 const size = async(req, res) => {
     field = [
         { path: "categoryId", model: "category", select: ["_id", "name"] },
@@ -102,7 +104,7 @@ const size = async(req, res) => {
 }
 
 
-
+//add product 
 const addProduct = async(req, res, next) => {
     data = req.item
     let getmerchant = await helperService.findQuery(MerchantModel, { _id: req.tokenData.id })
@@ -163,6 +165,7 @@ const addProduct = async(req, res, next) => {
     }
 }
 
+//get all product / by id /by name/ also sort by field name/limit/skip/ serch by name /by text, 
 const getProduct = async(req, res) => {
     req.query.merchantId = req.tokenData.id
     let field = [
@@ -219,6 +222,7 @@ const getProduct = async(req, res) => {
     }
 }
 
+//update product 
 const updateProduct = async(req, res, next) => {
     data = req.body
     data.updatedAt = new Date()

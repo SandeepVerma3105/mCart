@@ -33,7 +33,7 @@ const block = joi.object().keys({
 
 const size = joi.object().keys({
     categoryId: joi.string().min(24).max(24).required(),
-    size: joi.string().required().regex(pattern.capital),
+    size: joi.string().required().regex(pattern.SIZE),
 })
 
 module.exports = {

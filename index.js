@@ -13,6 +13,7 @@ app.use(helmet())
 app.use(morgan('dev'))
 app.use('/apiDocs', express.static(__dirname + '/view/swagger.json'));
 app.use("/dev-api.mcart.com", routes)
+
 app.listen(port, (err) => {
     if (err) throw err
     else {

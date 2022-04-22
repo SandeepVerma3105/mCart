@@ -1,7 +1,9 @@
+//common constent file
 module.exports = message = {
     VALIDATION_ERROR: "validation error",
     EMAIL_NOT_EXIST: "email not exist",
     DATA_NOT_FOUND: "no data found",
+    CHANGE_CUSTOMER_STATUS: "customer status has been changed",
 
     UPDATE_QUANTITY: "quantity has beeen updated",
     ADD_CART: "product added into cart",

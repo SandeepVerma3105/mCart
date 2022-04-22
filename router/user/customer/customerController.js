@@ -26,11 +26,14 @@ const number = require("joi/lib/types/number")
 const { CategoryModel } = require("../../../models/category")
 const { BrandModel } = require("../../../models/brand")
 
+//user registration
 const signUp = async(req, res, next) => {
     data = req.item
+
+    //generate a random addressId 
     addressId = await KEY.random_key()
     console.log(data.phoneNumber)
-        //insert customer detail in user table
+        //insert customer detail in user collection
     getdata = await helperService.findQuery(UserModel, { phoneNumber: data.phoneNumber })
     if (getdata.length > 0) {
         result = await successResponse(
@@ -69,6 +72,7 @@ const signUp = async(req, res, next) => {
         if (getUserData.length > 0) {
 
             let { houseNo, colony, pinCode, city, state, country } = req.body.address
+                //inserting data in useraddress 
             let addresses = await helperService.insertQuery(UserAddressModel, {
                 userId: getUserData._id,
                 houseNo: houseNo,
@@ -108,34 +112,11 @@ const signUp = async(req, res, next) => {
     }
 }
 
+//customer login 
 const signIn = async(req, res) => {
-    data = req.body
-    getdata = await helperService.findQuery(UserModel, { phoneNumber: data.phoneNumber })
-    if (getdata.errors) {
-        result = await successResponse(
-            true,
-            null,
-            httpStatus.OK, {
-                errCode: errors.INTERNAL_SERVER_ERROR.status,
-                errMsg: constents.INTERNAL_SERVER_ERROR
-            },
-            ""
-        )
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-    } else if (getdata == 0) {
-        result = await successResponse(
-            true,
-            null,
-            httpStatus.OK, {
-                errCode: errors.UNAUTHORIZED.status,
-                errMsg: constents.INVALID_CREDENTIAL
-            },
-            ""
-        )
-        res.status(httpStatus.UNAUTHORIZED).json(result)
-    } else {
-        getOtpData = await helperService.findQuery(OtpModel, { phoneNumber: data.phoneNumber, otp: data.otp })
-        if (getOtpData.errors) {
+        data = req.body
+        getdata = await helperService.findQuery(UserModel, { phoneNumber: data.phoneNumber })
+        if (getdata.errors) {
             result = await successResponse(
                 true,
                 null,
@@ -146,40 +127,72 @@ const signIn = async(req, res) => {
                 ""
             )
             res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-        } else if (getOtpData == 0) {
+        } else if (getdata == 0) {
             result = await successResponse(
                 true,
                 null,
                 httpStatus.OK, {
                     errCode: errors.UNAUTHORIZED.status,
-                    errMsg: constents.OTP_EXPIRED
+                    errMsg: constents.INVALID_CREDENTIAL
                 },
                 ""
             )
             res.status(httpStatus.UNAUTHORIZED).json(result)
         } else {
-            let token = jwtToken(getdata[0].phoneNumber, "customer", getdata[0]._id)
-            let refreshToken = jwtrefreshToken(getdata[0].phoneNumber, "customer", getdata[0]._id)
-            await OtpModel.remove({ phoneNumber: getdata[0].phoneNumber })
-            result = await successResponse(
-                true, {
-                    _id: getdata[0]._id,
-                    phoneNumber: getdata[0].phoneNumber,
-                    token: token,
-                    refreshToken: refreshToken
-                },
-                httpStatus.OK,
-                "",
-                constents.LOG_IN)
-            res.status(httpStatus.OK).json(result)
+
+            //check otp is exist or not or expired
+            getOtpData = await helperService.findQuery(OtpModel, { phoneNumber: data.phoneNumber, otp: data.otp })
+            if (getOtpData.errors) {
+                result = await successResponse(
+                    true,
+                    null,
+                    httpStatus.OK, {
+                        errCode: errors.INTERNAL_SERVER_ERROR.status,
+                        errMsg: constents.INTERNAL_SERVER_ERROR
+                    },
+                    ""
+                )
+                res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+            } else if (getOtpData == 0) {
+                result = await successResponse(
+                    true,
+                    null,
+                    httpStatus.OK, {
+                        errCode: errors.UNAUTHORIZED.status,
+                        errMsg: constents.OTP_EXPIRED
+                    },
+                    ""
+                )
+                res.status(httpStatus.UNAUTHORIZED).json(result)
+            } else {
+
+                //generate access token
+                let token = jwtToken(getdata[0].phoneNumber, "customer", getdata[0]._id)
+                    //generate refresh token
+                let refreshToken = jwtrefreshToken(getdata[0].phoneNumber, "customer", getdata[0]._id)
+                    //delete otp after verification
+                await OtpModel.remove({ phoneNumber: getdata[0].phoneNumber })
+                result = await successResponse(
+                    true, {
+                        _id: getdata[0]._id,
+                        phoneNumber: getdata[0].phoneNumber,
+                        token: token,
+                        refreshToken: refreshToken
+                    },
+                    httpStatus.OK,
+                    "",
+                    constents.LOG_IN)
+                res.status(httpStatus.OK).json(result)
+            }
         }
     }
-}
+    //generate otp while sign in
 const getnerateOTP = async(req, res) => {
     data = req.item
     getdata = await helperService.findQuery(UserModel, { phoneNumber: data.phoneNumber })
     console.log(getdata)
     if (getdata.length > 0) {
+        //generate otp
         getOtp = await otp.getnerateOTP({ phoneNumber: data.phoneNumber })
         if (getOtp == 1) {
             result = await successResponse(
@@ -243,7 +256,7 @@ const getnerateOTP = async(req, res) => {
 }
 
 
-
+//updatae address 
 const updateAddress = async(req, res) => {
     data = req.item
     id = req.query.addressId
@@ -284,6 +297,7 @@ const updateAddress = async(req, res) => {
     }
 }
 
+//add address 
 const addAddress = async(req, res) => {
     data = req.body
     addressId = await KEY.random_key()
@@ -323,6 +337,7 @@ const addAddress = async(req, res) => {
     })
 }
 
+//get address list of an perticular customer
 const addressList = async(req, res) => {
     getdata = await helperService.findQuery(CartModel, { userId: req.tokenData.id })
     if (getdata.length > 0) {
@@ -359,6 +374,7 @@ const addressList = async(req, res) => {
     }
 }
 
+//get category list
 const category = async(req, res) => {
     getdata = await helperService.findQuery(CategoryModel, req.query)
     console.log(getdata)
@@ -384,6 +400,7 @@ const category = async(req, res) => {
     }
 }
 
+//get brand list
 const brands = async(req, res) => {
     field = [
         { path: "categoryId", model: "category", select: ["_id", "name"] },
@@ -405,13 +422,13 @@ const brands = async(req, res) => {
             true, { data: getdata, count: getdata.count },
             httpStatus.OK,
             "",
-            constents.CATEGORY_LIST
+            constents.BRAND_LIST
         )
         res.status(httpStatus.OK).json(result)
     }
 }
 
-
+//get product list
 const getProduct = async(req, res) => {
     req.query.isDelete = false
     req.query.status = false
@@ -472,9 +489,9 @@ const getProduct = async(req, res) => {
     }
 }
 
+//add product into cart
 const addCart = async(req, res) => {
     data = req.item
-        // data.userId = req.query.userId
     getData = await helperService.findQuery(ProductModel, { _id: data.productId })
     console.log(getData)
     if (getData == 0) {
@@ -563,6 +580,7 @@ const addCart = async(req, res) => {
     }
 }
 
+//remove product from cart
 const removeCart = async(req, res) => {
     data = {
         productId: req.item.productId,
@@ -604,6 +622,7 @@ const removeCart = async(req, res) => {
     }
 }
 
+//order your product 
 const placeOrder = async(req, res) => {
     data = req.item
     getCartData = await helperService.findQuery(CartModel, { userId: req.tokenData.id })
@@ -613,6 +632,7 @@ const placeOrder = async(req, res) => {
             getData = await helperService.findQuery(ProductModel, { _id: element.productId })
             if (getData.length > 0 && getData[0].unit >= element.unit) {
                 orderIds = []
+                    //calculate total amount
                 amount = Number(element.unit * element.baseCost) - (Number(element.unit * element.baseCost) * Number(getData[0].discount / 100))
                 grandTotal += Number(element.unit * element.baseCost) - (Number(element.unit * element.baseCost) * Number(getData[0].discount / 100))
                 getdata = await helperService.insertQuery(OrderDetailModel, {
@@ -640,6 +660,7 @@ const placeOrder = async(req, res) => {
                 }
                 if (getdata.length > 0 && !getdata.errors)
                     unit = getData[0].unit - element.unit
+
                 updateQuantity = await helperService.updateQuery(ProductModel, { _id: element.productId }, { unit: unit })
                     .then(async() => {
                         deleteData = await CartModel.deleteOne({ productId: element.productId, userId: req.tokenData.id })
@@ -712,6 +733,7 @@ const placeOrder = async(req, res) => {
 
 }
 
+//check your cart here
 const checkCart = async(req, res) => {
     getdata = await helperService.findQuery(CartModel, { userId: req.tokenData.id })
     console.log(getdata)
@@ -749,6 +771,7 @@ const checkCart = async(req, res) => {
     }
 }
 
+//track your order  
 const trackOrder = async(req, res) => {
     data = req.item
     field = [
@@ -780,6 +803,7 @@ const trackOrder = async(req, res) => {
     }
 }
 
+// get order history
 const orderHistory = async(req, res) => {
     data = req.item
     field = [
@@ -808,6 +832,7 @@ const orderHistory = async(req, res) => {
     }
 }
 
+//update product unit in your cart
 const updateUnit = async(req, res) => {
     data = req.body
     await helperService.findQuery(CartModel, { userId: req.tokenData.id, productId: data.productId })

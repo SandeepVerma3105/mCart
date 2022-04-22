@@ -11,32 +11,16 @@ const errors = require("../../../error/error")
 const helperService = require("../../../services/helper")
 const { successResponse } = require("../../../response/success")
 
+//order list of a prticular merchant
 const orders = async(req, res) => {
     req.query.merchantId = req.tokenData.id
     regex = new RegExp(req.query.productName, 'i')
-        // field = [{ path: "productId", model: "product", select: ["_id", "name"] },
-        //         // {  path: "userId",  model: "user",select: ["firstName", "lastName",]},
-        //     ]
-        // if (req.query.productName) {
-        //     regex = new RegExp(req.query.productName, 'i')
-        //     field = [
-        //         { path: "productId", model: "product", select: ["name"], match: { name: regex } },
-        //     ]
-        // }
     field = [
-            { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
-            { path: "productId", model: "product", select: ["name"], match: { name: regex } },
-            { path: "userAddressId", model: "userAddress" },
-            { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "phoneNumber", "email"] }
-        ]
-        // if (req.query._id) {
-        //     field = [
-        //         { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
-        //         { path: "productId", model: "product", select: ["name"], match: { name: regex } },
-        //         { path: "userAddressId", model: "userAddress" },
-        //         { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "phoneNumber", "email"] }
-        //     ]
-        // }
+        { path: "userId", model: "user", select: ["_id", "firstName", "lastName", "email"] },
+        { path: "productId", model: "product", select: ["name"], match: { name: regex } },
+        { path: "userAddressId", model: "userAddress" },
+        { path: "merchantId", model: "merchant", select: ["_id", "firstName", "lastName", "phoneNumber", "email"] }
+    ]
     getdata = await helperService.populateQuery(OrderDetailModel, req.query, field)
     if (getdata.error) {
         result = await successResponse(
@@ -76,6 +60,7 @@ const orders = async(req, res) => {
     }
 }
 
+//change the status of an order
 const changeOrederStatus = async(req, res) => {
     data = req.item
     msg = ""
@@ -145,7 +130,8 @@ const changeOrederStatus = async(req, res) => {
     }
 }
 
-
+//accept an order
+//befor accept an order check the unit of prodct is available or not
 const acceptOrder = async(req, res) => {
     data = req.body
     checkUnit = await helperService.populateQuery(
@@ -225,9 +211,8 @@ const acceptOrder = async(req, res) => {
     }
 }
 
+//find a prticular order detail
 const ordersDetail = async(req, res) => {
-
-
     field = [
         { path: "productId", model: "product", select: ["name"] },
     ]

@@ -16,6 +16,7 @@ const jwtToken = (email, role, id) => {
     return token
 }
 
+//function to generate jwt token
 const jwtrefreshToken = (email, role, id) => {
     const token = jwt.sign({
             user: email,

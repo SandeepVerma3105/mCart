@@ -1,5 +1,7 @@
 const { MerchantBlockedCustomerModel } = require("../models/merchantBlockedCustomer")
 
+
+//update query for  MerchantBlockedCustomer Model 
 const updateQuery = async(model, query, data) => {
     console.log(data, query)
     try {

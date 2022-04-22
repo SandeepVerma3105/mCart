@@ -22,7 +22,7 @@ const { successResponse } = require("../../response/success")
 const { SizeModel } = require("../../models/size")
 
 
-
+//admin login
 const Login = async(req, res) => {
     data = req.body
     console.log(req.body)
@@ -69,10 +69,10 @@ const Login = async(req, res) => {
     }
 }
 
-
+//forget password 
 const forgetPaassword = async(req, res) => {
     data = req.item
-
+        //generate OTP
     getOtp = await otp.getnerateOTP({ email: data.email })
     if (getOtp == 1) {
         result = await successResponse(
@@ -109,6 +109,7 @@ const forgetPaassword = async(req, res) => {
     }
 }
 
+//create a new merchant
 const addMerchant = async(req, res, next) => {
     data = req.item
     pass = await KEY.random_key()
@@ -124,7 +125,7 @@ const addMerchant = async(req, res, next) => {
             },
             ""
         )
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
+        res.status(httpStatus.CONFLICT).json(result)
     } else {
         let getdata = await helperService.insertQuery(MerchantModel, {
             firstName: data.firstName || "null",
@@ -161,6 +162,7 @@ const addMerchant = async(req, res, next) => {
     }
 }
 
+//block merchant
 const blockMerchant = async(req, res) => {
     data = req.item
     console.log(data)
@@ -196,7 +198,7 @@ const blockMerchant = async(req, res) => {
                 },
                 httpStatus.OK,
                 "",
-                constents.CHANGE_customer_STATUS
+                constents.CHANGE_CUSTOMER_STATUS
             )
             res.status(httpStatus.OK).json(result)
         }).catch(async(err) => {
@@ -215,7 +217,7 @@ const blockMerchant = async(req, res) => {
     }
 }
 
-
+//add category 
 const addCategory = async(req, res, next) => {
     data = req.item
     addressId = await KEY.random_key()
@@ -262,6 +264,7 @@ const addCategory = async(req, res, next) => {
     }
 }
 
+//add brand for a specific category
 const addBrand = async(req, res, next) => {
     data = req.item
     console.log(data)
@@ -324,6 +327,7 @@ const addBrand = async(req, res, next) => {
     })
 }
 
+//add size according category
 const size = async(req, res, next) => {
     data = req.item
     console.log(data)

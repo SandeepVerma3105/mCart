@@ -1,3 +1,4 @@
+//resopnse structure
 const successResponse = async(status, response = "null", code, error = "null", message, data) => {
     if (error == "") {
         error = null

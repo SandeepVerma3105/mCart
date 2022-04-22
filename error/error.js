@@ -1,5 +1,7 @@
 const HttpStatus = require("http-status")
 
+//custome errors
+
 const INTERNAL_SERVER_ERROR = new Error("INTERNAL_SERVER_ERROR")
 INTERNAL_SERVER_ERROR.status = HttpStatus.INTERNAL_SERVER_ERROR + "INTERNAL_SERVER_ERROR"
 

@@ -14,31 +14,19 @@ const MerchantBlockedCustomerService = require("../../../services/customerMercha
 const { successResponse } = require("../../../response/success")
 const { CustomerMerchantMapping } = require("../../../models/customerMerchantMapping")
 
-
+//customer list of a merchant
 const customers = async(req, res) => {
     data = {}
     data.merchant = req.tokenData.id
-        // if (req.query.id) {
-        //     data._id = req.query.id
-        // }
-        // if (req.query.name) {
-        //     $or = [{ "customer._id.firstName": { $regex: '.*' + req.query.name + '.*', "$options": 'i' } },
-        //         { "customer._id.lastName": { $regex: '.*' + req.query.name + '.*', "$options": 'i' } }
-        //     ]
-        // }
-        // console.log(data)
-
 
     regex = new RegExp(req.query.name, 'i')
     field = [{ path: "customer._id", model: "user", select: ["-__v"] }]
     if (req.query.name) {
-
         field = [{ path: "customer._id", model: "user", select: ["-__v"], match: { $or: [{ firstName: regex }, { lastName: regex }] } }]
     }
     getdata = await helperService.populateQuery(CustomerMerchantMapping, data, field)
 
     if (getdata.error) {
-
         result = await successResponse(
             true,
             null,
@@ -50,13 +38,11 @@ const customers = async(req, res) => {
         )
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
     } else {
-        console.log(getdata[0].customer)
         arr = []
         getdata[0].customer.forEach(element => {
             if (element._id != null) {
                 arr.push(element)
             }
-
         });
         result = await successResponse(
             true, { data: arr, count: arr.length },
@@ -67,8 +53,9 @@ const customers = async(req, res) => {
         res.status(httpStatus.OK).json(result)
     }
 }
-const blockedCustomerList = async(req, res) => {
 
+//find list of blocked user
+const blockedCustomerList = async(req, res) => {
 
     field = [{ path: "customer._id", model: "user", select: ["-__v"] }]
     getdata = await helperService.populateQuery(MerchantBlockedCustomerModel, { merchant: req.tokenData.id }, field)
@@ -94,7 +81,7 @@ const blockedCustomerList = async(req, res) => {
     }
 }
 
-
+//find a perticular customer detail
 const customerDetail = async(req, res) => {
     req.query.merchantId = req.tokenData.id
 
@@ -133,7 +120,7 @@ const customerDetail = async(req, res) => {
     }
 }
 
-
+//block or unblockc an customer
 const blockCustomer = async(req, res) => {
     data = req.item
 
@@ -184,29 +171,6 @@ const blockCustomer = async(req, res) => {
     }
 }
 
-// const customersDetail = async(req, res) => {
-//     getdata = await helperService.populateQuery(UserModel, req.body, [])
-//     if (getdata.error) {
-//         result = await successResponse(
-//             true,
-//             null,
-//             httpStatus.OK, {
-//                 errCode: errors.INTERNAL_SERVER_ERROR.status,
-//                 errMsg: constents.INTERNAL_SERVER_ERROR
-//             },
-//             ""
-//         )
-//         res.status(httpStatus.INTERNAL_SERVER_ERROR).json(result)
-//     } else {
-//         result = await successResponse(
-//             true, { data: getdata, count: getdata.count },
-//             httpStatus.OK,
-//             "",
-//             constents.customer_LIST
-//         )
-//         res.status(httpStatus.OK).json(result)
-//     }
-// }
 
 
 module.exports = {

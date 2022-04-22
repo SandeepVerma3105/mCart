@@ -5,6 +5,8 @@ const customerSchema = require("./customerSchema")
 const { requestValidator } = require("../../../middleware/request_validator")
 const verifyToken = require("../../../middleware/auth")
 
+/***************************************Custmer APIs *************************************************************************** */
+
 route.post("/signUp", requestValidator(customerSchema.signUp), customerController.signUp)
 route.post("/generateOtp", requestValidator(customerSchema.phoneNumber), customerController.getnerateOTP)
 route.post("/signIn", requestValidator(customerSchema.signIn), customerController.signIn)
@@ -21,5 +23,7 @@ route.get("/orderHistory", verifyToken.verifyToken, verifyToken.parseJwtCustomer
 route.put("/updateUnit", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.updateUnit)
 route.get("/category", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.category)
 route.get("/brands", verifyToken.verifyToken, verifyToken.parseJwtCustomer, customerController.brands)
+
+/**************************************************************************************************************************************/
 
 module.exports = route

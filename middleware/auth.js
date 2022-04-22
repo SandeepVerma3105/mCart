@@ -42,6 +42,7 @@ function verifyToken(req, res, next) {
     });
 }
 
+//verify refresh 
 function verifyRefreshToken(req, res, next) {
     let token = req.headers['accesstoken'];
     console.log("TCL: verifyToken -> token", token)
@@ -120,6 +121,7 @@ async function parseJwtAdmin(req, res, next) {
     }
 }
 
+//valiation for customer to access apis
 async function parseJwtCustomer(req, res, next) {
     let token = req.headers['accesstoken']
     tokenData = jwtDecode(token)

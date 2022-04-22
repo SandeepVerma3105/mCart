@@ -6,13 +6,14 @@ const { UserModel } = require("../models/user")
 const { OtpModel } = require("../models/otp")
 const { CartModel } = require("../models/cart")
 const { BrandModel } = require("../models/brand")
-    /*
-    query to find data based on value, 
-    you can sort data based on any field ascending or in decending order
-    skip the data as you want or find n'th data
-    limit the data 
-    total count of data
-    */
+
+/*
+query to find data based on value, 
+you can sort data based on any field ascending or in decending order
+skip the data as you want or find n'th data
+limit the data 
+total count of data
+*/
 const findQuery = async(model, data = {}, res) => {
     data.isDelete = false
     if (!data.sortKey && !data.order) {
@@ -45,6 +46,7 @@ const findQuery = async(model, data = {}, res) => {
     }
 }
 
+//query to insert data 
 const insertQuery = async(model, data, res) => {
     try {
         res = await model.insertMany(data)
@@ -57,9 +59,11 @@ const insertQuery = async(model, data, res) => {
     }
 }
 
+
+//query to update document by id
 const updateByIdQuery = async(model, qury, data, res) => {
     try {
-        res = await model.findByIdAndUpdate(qury, data)
+        res = await model.findByIdAndUpdate(qury, data, { new: true })
         if (res == null) {
             return 0
         } else {
@@ -111,9 +115,10 @@ const populateQuery = async(model, data, field) => {
     }
 }
 
+//query to update data according to condition
 const updateQuery = async(model, qury, data, res) => {
     try {
-        res = await model.updateOne(qury, data)
+        res = await model.updateOne(qury, data, { original: true })
 
         if (res.modifiedCount == 0) {
             return 0

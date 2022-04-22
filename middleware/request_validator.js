@@ -5,6 +5,7 @@ const errors = require("../error/error")
 const { successResponse } = require("../response/success")
 const constents = require("../constents/constent")
 
+//validate schema coming data from client side
 const requestValidator = (schema, property = "body") => async(req, res, next) => {
     data = req[property]
     try {

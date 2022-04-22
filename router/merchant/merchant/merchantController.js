@@ -13,9 +13,10 @@ const KEY = require("../../../utils/randamKey")
 const helperService = require("../../../services/helper")
 const { successResponse } = require("../../../response/success")
 
+//customer regitration
 const signUp = async(req, res, next) => {
     data = req.item
-
+        //generatae random addressId
     addressId = await KEY.random_key()
     getdata = await helperService.findQuery(MerchantModel, { email: data.email })
 
@@ -92,6 +93,7 @@ const signUp = async(req, res, next) => {
     }
 }
 
+//merchant login
 const Login = async(req, res) => {
     data = req.body
     getdata = await helperService.findQuery(MerchantModel, { email: data.email, password: data.password })
@@ -135,6 +137,7 @@ const Login = async(req, res) => {
     }
 }
 
+//merchant profile
 const profile = async(req, res, next) => {
     data = req.query
     qury = { _id: req.tokenData.id }
@@ -211,6 +214,7 @@ const updateProfile = async(req, res, next) => {
     }
 }
 
+//update merchant address
 const updateAddress = async(req, res) => {
     data = req.item
     id = req.query.addressId
@@ -242,7 +246,7 @@ const updateAddress = async(req, res) => {
     } else {
         result = await successResponse(
             true,
-            "",
+            getdata,
             httpStatus.OK,
             "",
             constents.ADDRESS_UPDATED
@@ -251,6 +255,7 @@ const updateAddress = async(req, res) => {
     }
 }
 
+//add new merchant  address 
 const addAddress = async(req, res) => {
     data = req.body
     addressId = await KEY.random_key()
